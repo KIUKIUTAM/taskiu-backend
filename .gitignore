@@ -1,0 +1,76 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+
+### Mac ###
+.DS_Store
+
+
+### Logs ###
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+### Spring Boot ###
+spring-boot-devtools.properties
+spring-boot-devtools.yml
+spring-boot-devtools.log
+
+
+
+### Security ###
+*.jks
+*.keystore
+*.p12
+*.pem
+*.crt
+*.cert
+.env
+.env.local
+.env.*.local
+secrets/
+credentials/
+application-*.yml
+application-*.yaml
+application-*.properties
