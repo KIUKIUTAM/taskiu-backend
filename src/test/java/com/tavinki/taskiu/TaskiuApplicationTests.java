@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.tavinki.taskiu.mongo.entity.User;
+import com.tavinki.taskiu.mongo.service.UserService;
 import com.tavinki.taskiu.redis.RedisService;
 
 @SpringBootTest
@@ -27,6 +29,9 @@ class TaskiuApplicationTests {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private UserService userService;
 
 	@Test
 	void contextLoads() {
@@ -78,6 +83,16 @@ class TaskiuApplicationTests {
 		rabbitTemplate.convertAndSend(queueName, testMessage);
 		logger.info("Sent message to RabbitMQ queue '{}': {}", queueName, testMessage);
 		assertThat(1).isEqualTo(1);
+	}
+
+	@Test
+	void testMongoDBConnection() {
+		// This test will simply check if the application context loads with MongoDB
+		// dependencies
+		User user = User.builder().email("test1@test.com").name("Test User").avatar(null).build();
+		userService.createUser(user);
+		assertThat(1).isEqualTo(1);
+		logger.info("MongoDB dependencies are properly configured.");
 	}
 
 }

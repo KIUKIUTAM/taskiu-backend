@@ -1,9 +1,7 @@
-package com.tavinki.taskiu.controller;
+package com.tavinki.taskiu.test.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.annotation.Resource;
 
 @RestController
 @RequestMapping("/api/users")
