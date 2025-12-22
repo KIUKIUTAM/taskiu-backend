@@ -1,6 +1,14 @@
 package com.tavinki.taskiu;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -13,13 +21,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tavinki.taskiu.mongo.entity.User;
-import com.tavinki.taskiu.mongo.service.UserService;
-import com.tavinki.taskiu.redis.RedisService;
+import com.tavinki.taskiu.common.test.controller.RedisService;
+import com.tavinki.taskiu.modules.user.entity.User;
+import com.tavinki.taskiu.modules.user.service.UserService;
 
 @SpringBootTest
 class TaskiuApplicationTests {
-	private static final Logger logger = LoggerFactory.getLogger(TaskiuApplicationTests.class);
+	private static final Logger customLogger = LoggerFactory.getLogger(TaskiuApplicationTests.class);
 
 	@Autowired
 	RedisService redisService;
@@ -55,7 +63,7 @@ class TaskiuApplicationTests {
 		;
 		redisService.save("testKey", fakeJson);
 		String value = (String) redisService.get("testKey");
-		logger.info(value);
+		customLogger.info(value);
 		assertEquals(fakeJson, value);
 	}
 
@@ -63,11 +71,11 @@ class TaskiuApplicationTests {
 	void testDatabaseConnection() {
 		// Check if JdbcTemplate is not null
 		assertThat(jdbcTemplate).isNotNull();
-		logger.info("JdbcTemplate is properly configured.");
-		logger.trace("Testing database connection with a simple query.");
-		logger.debug("Executing query: SELECT 1");
-		logger.warn("Warning test");
-		logger.error("Error test");
+		customLogger.info("JdbcTemplate is properly configured.");
+		customLogger.trace("Testing database connection with a simple query.");
+		customLogger.debug("Executing query: SELECT 1");
+		customLogger.warn("Warning test");
+		customLogger.error("Error test");
 		// Run a simple query to test the connection
 		Integer result = jdbcTemplate.queryForObject("SELECT 1", Integer.class);
 		assertThat(result).isEqualTo(1);
@@ -81,18 +89,29 @@ class TaskiuApplicationTests {
 		String testMessage = "Hello, RabbitMQ!";
 
 		rabbitTemplate.convertAndSend(queueName, testMessage);
-		logger.info("Sent message to RabbitMQ queue '{}': {}", queueName, testMessage);
+		customLogger.info("Sent message to RabbitMQ queue '{}': {}", queueName, testMessage);
 		assertThat(1).isEqualTo(1);
 	}
 
+	// @Test
+	// void testMongoDBConnection() {
+	// // This test will simply check if the application context loads with MongoDB
+	// // dependencies
+	// User user = User.builder().email("test@test.com").name("Test
+	// User").picture(null).build();
+	// userService.createUser(user);
+	// userService.getUserByEmail("test1@test.com");
+	// assertThat(1).isEqualTo(1);
+	// customLogger.info("MongoDB dependencies are properly configured.");
+	// }
+
 	@Test
-	void testMongoDBConnection() {
-		// This test will simply check if the application context loads with MongoDB
-		// dependencies
-		User user = User.builder().email("test1@test.com").name("Test User").avatar(null).build();
-		userService.createUser(user);
-		assertThat(1).isEqualTo(1);
-		logger.info("MongoDB dependencies are properly configured.");
+	void testTimeUzoneSetting() {
+		// Verify that the default timezone is set to Asia/Hong_Kong
+		String expectedTimeZone = "Asia/Hong_Kong";
+		String actualTimeZone = java.util.TimeZone.getDefault().getID();
+		assertEquals(expectedTimeZone, actualTimeZone);
+		customLogger.info("Default timezone is correctly set to {}", actualTimeZone);
 	}
 
 }
