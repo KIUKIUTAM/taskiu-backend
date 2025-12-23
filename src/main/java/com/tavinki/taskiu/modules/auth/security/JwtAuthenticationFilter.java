@@ -58,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UserResponseDto user = userOptional.get();
 
                     // 4. 建立 Authentication 物件 (這是 Spring Security 認得的憑證)
-                    // 第三個參數是權限列表 (Authorities)，目前給空 List，之後可加入 Role
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             user,
                             null,
@@ -66,9 +65,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     // 5. 將驗證資訊放入 SecurityContext
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    customLogger.info("JWT Authentication successful for user: {}", user.getId());
 
-                    // (可選) 為了相容舊程式碼，也可以同時 setAttribute
-                    request.setAttribute("userId", user.getId());
+                } else {
+                    customLogger.warn(jwt);
                 }
             }
         } catch (Exception e) {

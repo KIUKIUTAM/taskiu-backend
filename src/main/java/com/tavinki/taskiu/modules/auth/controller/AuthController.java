@@ -11,6 +11,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 
 import com.tavinki.taskiu.common.enums.LoginType;
+import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.InvalidRefreshTokenException;
 import com.tavinki.taskiu.common.utils.HttpUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
@@ -59,7 +60,9 @@ public class AuthController {
             customLogger.info("Existing user logged in: {}", user.getEmail());
         } else {
             customLogger.info("New user registration: {}", userInfo.getEmail());
-            user = userService.createUser(UserMapper.googleToEntity(userInfo));
+
+            user = UserMapper.googleToEntity(userInfo);
+            user = userService.createUser(user);
         }
         accessToken = authService.generateJwtToken(user);
         refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);

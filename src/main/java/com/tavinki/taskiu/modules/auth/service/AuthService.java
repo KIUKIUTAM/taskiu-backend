@@ -88,9 +88,9 @@ public class AuthService {
     }
 
     // authenticate
-    public Optional<UserResponseDto> extractUserFromToken(String jwtToken) {
+    public Optional<UserResponseDto> extractUserFromToken(String jwt) {
 
-        Claims claims = jwtUtils.getClaims(jwtToken).orElse(null);
+        Claims claims = jwtUtils.getClaims(jwt).orElse(null);
         if (claims == null) {
             return Optional.empty();
         }

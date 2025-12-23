@@ -1,5 +1,6 @@
 package com.tavinki.taskiu.modules.auth.mapper;
 
+import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
 import com.tavinki.taskiu.modules.auth.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
@@ -15,6 +16,7 @@ public class UserMapper {
                 .email(userInfo.getEmail())
                 .name(userInfo.getName())
                 .picture(userInfo.getPicture())
+                .role(RoleType.USER)
                 .auth(User.Auth.builder()
                         .google(User.GoogleAuth.builder()
                                 .id(userInfo.getSub())

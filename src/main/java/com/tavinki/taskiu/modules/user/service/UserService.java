@@ -1,5 +1,6 @@
 package com.tavinki.taskiu.modules.user.service;
 
+import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.UserAlreadyExistsException;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserRepository;
@@ -34,11 +35,6 @@ public class UserService {
         User user = getUserByEmail(oldEmail);
         user.setEmail(newEmail);
         userRepository.save(user);
-    }
-
-    public User getUserByRefreshToken(String refreshToken) {
-        return userRepository.findByRefreshToken_Token(refreshToken)
-                .orElse(null);
     }
 
     public void updateUser(User user) {

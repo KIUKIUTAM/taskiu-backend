@@ -21,6 +21,4 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{ 'name' : ?0 }")
     List<User> findUsersByNameCustom(String name);
 
-    Optional<User> findByRefreshToken_Token(String token);
-
 }
