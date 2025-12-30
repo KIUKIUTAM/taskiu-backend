@@ -1,6 +1,5 @@
 package com.tavinki.taskiu.modules.user.service;
 
-import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.UserAlreadyExistsException;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserRepository;

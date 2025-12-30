@@ -11,15 +11,14 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 
 import com.tavinki.taskiu.common.enums.LoginType;
-import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.InvalidRefreshTokenException;
 import com.tavinki.taskiu.common.utils.HttpUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
-import com.tavinki.taskiu.modules.auth.mapper.UserMapper;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService.RefreshTokenResult;
 import com.tavinki.taskiu.modules.user.entity.User;
+import com.tavinki.taskiu.modules.user.mapper.UserMapper;
 import com.tavinki.taskiu.modules.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +41,7 @@ public class AuthController {
 
     private static final String MESSAGE = "message";
 
-    private static final String ACCESS_TOKEN = "access_token";
+    private static final String ACCESS_TOKEN = "accessToken";
 
     @PostMapping("/google")
     public ResponseEntity<Map<String, Object>> googleLogin(@RequestBody GoogleLoginRequest googleRequest,
@@ -52,7 +51,7 @@ public class AuthController {
         String userAgent = HttpUtils.getUserAgent(request);
 
         GoogleUser userInfo = authService.authorizationCodeExchange(googleRequest.getCode(),
-                googleRequest.getCodeVerifier());
+                googleRequest.getCode_verifier());
         User user = userService.getUserByEmail(userInfo.getEmail());
         String accessToken = null;
         String refreshToken = null;
@@ -60,7 +59,6 @@ public class AuthController {
             customLogger.info("Existing user logged in: {}", user.getEmail());
         } else {
             customLogger.info("New user registration: {}", userInfo.getEmail());
-
             user = UserMapper.googleToEntity(userInfo);
             user = userService.createUser(user);
         }
@@ -85,7 +83,7 @@ public class AuthController {
                 .body(Map.of(MESSAGE, "Logout successful"));
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refresh-token")
     public ResponseEntity<TokenResponse> refreshToken(
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             HttpServletRequest request) {
@@ -122,7 +120,7 @@ public class AuthController {
     @Data
     public static class GoogleLoginRequest {
         private String code;
-        private String codeVerifier;
+        private String code_verifier;
     }
 
     public record TokenResponse(

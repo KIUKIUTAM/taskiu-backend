@@ -21,7 +21,7 @@ import com.tavinki.taskiu.common.exception.AuthException;
 import com.tavinki.taskiu.common.properties.GoogleLoginProperties;
 import com.tavinki.taskiu.common.utils.JwtUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
-import com.tavinki.taskiu.modules.auth.dto.UserResponseDto;
+import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
 
 import io.jsonwebtoken.Claims;

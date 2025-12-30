@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.tavinki.taskiu.modules.auth.dto.UserResponseDto;
+import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
 @RestController
 @RequestMapping("/users")

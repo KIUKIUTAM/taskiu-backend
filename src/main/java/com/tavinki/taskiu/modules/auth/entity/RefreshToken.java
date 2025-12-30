@@ -23,7 +23,7 @@ public class RefreshToken {
     @Indexed
     private String userId;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, sparse = true)
     private String token;
 
     private String userAgent;

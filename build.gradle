@@ -63,6 +63,8 @@ tasks.named('test') {
 }
 
 test {
+    // Fixes JDK 21+ warning for Mockito/ByteBuddy
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
     testLogging {
         // Show standard out and standard error
         events "standardOut", "standardError"

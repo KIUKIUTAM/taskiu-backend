@@ -1,8 +1,8 @@
-package com.tavinki.taskiu.modules.auth.mapper;
+package com.tavinki.taskiu.modules.user.mapper;
 
 import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
-import com.tavinki.taskiu.modules.auth.dto.UserResponseDto;
+import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
 
 public class UserMapper {

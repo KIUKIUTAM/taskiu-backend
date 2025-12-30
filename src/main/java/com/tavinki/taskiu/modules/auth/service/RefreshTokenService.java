@@ -1,6 +1,5 @@
 package com.tavinki.taskiu.modules.auth.service;
 
-import java.sql.Ref;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,8 +9,6 @@ import org.springframework.stereotype.Service;
 import com.tavinki.taskiu.common.properties.AppTokenProperties;
 import com.tavinki.taskiu.modules.auth.entity.RefreshToken;
 import com.tavinki.taskiu.modules.auth.repository.RefreshTokenRepository;
-import com.tavinki.taskiu.modules.user.entity.User;
-import com.tavinki.taskiu.modules.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
