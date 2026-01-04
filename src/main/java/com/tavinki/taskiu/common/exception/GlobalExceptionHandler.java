@@ -44,11 +44,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // 4. 攔截所有未知的錯誤 (兜底)
+    // Debug only: print stack trace
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllUncaughtException(Exception ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error has occurred. Please contact the administrator.");
+                "An unexpected error has occurred. Please contact the administrator." + ex.getMessage());
         problem.setTitle("Internal Server Error");
         return problem;
     }

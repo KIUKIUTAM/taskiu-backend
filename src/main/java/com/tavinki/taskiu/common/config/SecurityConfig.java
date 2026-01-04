@@ -14,6 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.tavinki.taskiu.common.properties.AppSecurityProperties;
 import com.tavinki.taskiu.common.properties.CorsProperties;
+import com.tavinki.taskiu.common.properties.CspProperties;
 import com.tavinki.taskiu.modules.auth.security.JwtAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +32,8 @@ public class SecurityConfig {
 
     private final CorsProperties corsProperties;
 
+    private final CspProperties cspProperties;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -38,6 +41,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
+                // .headers(headers -> headers
+                // .contentSecurityPolicy(csp -> csp
+                // .policyDirectives(
+                // cspProperties.toString())))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(appSecurityConfig.getWhitelist().toArray(new String[0])).permitAll()
