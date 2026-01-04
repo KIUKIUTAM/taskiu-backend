@@ -54,6 +54,7 @@ public class User {
     @AllArgsConstructor
     public static class Auth {
         private GoogleAuth google;
+        private GithubAuth github;
     }
 
     @Data
@@ -61,6 +62,15 @@ public class User {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GoogleAuth {
+        private String id;
+        private String email;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GithubAuth {
         private String id;
         private String email;
     }

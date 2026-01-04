@@ -1,6 +1,7 @@
 package com.tavinki.taskiu.modules.auth.service;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,8 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.AuthException;
 import com.tavinki.taskiu.common.properties.GoogleLoginProperties;
+import com.tavinki.taskiu.common.properties.GithubLoginProperties;
 import com.tavinki.taskiu.common.utils.JwtUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
 
@@ -37,9 +40,10 @@ public class AuthService {
     private final JwtUtils jwtUtils;
 
     private final GoogleLoginProperties googleLoginProperties;
+    private final GithubLoginProperties githubLoginProperties;
 
     // Exchange authorization code for user info from Google
-    public GoogleUser authorizationCodeExchange(String authorizationCode, String codeVerifier) {
+    public GoogleUser googleAuthorizationCodeExchange(String authorizationCode, String codeVerifier) {
 
         RestClient restClient = restClientBuilder.build();
 
@@ -75,12 +79,93 @@ public class AuthService {
         } catch (HttpClientErrorException e) {
             String body = e.getResponseBodyAsString();
             String status = e.getStatusCode().toString();
-            customLogger.error("Google Login Failed: status={}, body={}", status, body, e);
+            customLogger.error("Google login failed: {} {}", status, body);
             throw new AuthException("Google login failed: " + status + " " + body, e);
         } catch (Exception e) {
-            customLogger.error("Internal Server Error while handling Google login", e);
+            customLogger.error("Internal Server Error", e);
             throw new AuthException("Internal Server Error", e);
         }
+    }
+
+    // unfinished - Exchange authorization code for user info from GitHub
+    // googleuser used for simplicity
+    public GitHubUser githubAuthorizationCodeExchange(String authorizationCode, String codeVerifier) {
+
+        RestClient restClient = restClientBuilder.build();
+
+        // Exchange authorization code for access token
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("code", authorizationCode);
+        formData.add("client_id", githubLoginProperties.getClientId());
+        formData.add("client_secret", githubLoginProperties.getClientSecret());
+        formData.add("code_verifier", codeVerifier);
+        formData.add("redirect_uri", githubLoginProperties.getRedirectUri());
+
+        Map<String, Object> tokenResponse = restClient.post()
+                .uri("https://github.com/login/oauth/access_token")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(formData)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        if (tokenResponse == null || !tokenResponse.containsKey("access_token")) {
+            throw new AuthException("Failed to retrieve access token from GitHub");
+        }
+
+        String accessToken = (String) tokenResponse.get("access_token");
+        GitHubUser userInfo = null;
+        try {
+            userInfo = restClient.get()
+                    .uri("https://api.github.com/user")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(GitHubUser.class);
+
+            // if email is null, fetch from /user/emails endpoint, which requires extra
+            // scope(email)
+            // Or email ends with noreply.github.com
+            if (userInfo != null) {
+                boolean needFetchEmail = userInfo.getEmail() == null
+                        || userInfo.getEmail().isBlank()
+                        || userInfo.getEmail().endsWith("noreply.github.com");
+
+                if (needFetchEmail) {
+                    // 呼叫 /user/emails
+                    List<Map<String, Object>> emails = restClient.get()
+                            .uri("https://api.github.com/user/emails")
+                            .header("Authorization", "Bearer " + accessToken)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<>() {
+                            });
+
+                    if (emails != null) {
+                        String primaryEmail = emails.stream()
+                                .filter(e -> Boolean.TRUE.equals(e.get("primary")))
+                                .filter(e -> Boolean.TRUE.equals(e.get("verified")))
+                                .map(e -> (String) e.get("email"))
+                                .findFirst()
+                                .orElse(null); // 如果真的找不到，就保持 null
+
+                        // 只有抓到了才覆蓋，沒抓到就維持原樣 (可能是 null 或 noreply)
+                        if (primaryEmail != null) {
+                            userInfo.setEmail(primaryEmail);
+                        }
+                    }
+                }
+            }
+            return userInfo;
+        } catch (HttpClientErrorException e) {
+            String body = e.getResponseBodyAsString();
+            String status = e.getStatusCode().toString();
+            customLogger.error("GitHub login failed: {} {}", status, body);
+            throw new AuthException("GitHub login failed: " + status + " " + body, e);
+        } catch (Exception e) {
+            customLogger.error("Failed to fetch user profile from GitHub", e);
+            throw new AuthException("Failed to fetch user profile from GitHub", e);
+        }
+
     }
 
     public String generateJwtToken(User user) {

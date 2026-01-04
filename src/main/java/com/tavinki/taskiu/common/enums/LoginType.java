@@ -4,4 +4,5 @@ public enum LoginType {
     EMAIL,
     GOOGLE,
     APPLE,
+    GITHUB
 }
