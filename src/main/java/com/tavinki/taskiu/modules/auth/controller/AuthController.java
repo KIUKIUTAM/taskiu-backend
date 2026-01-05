@@ -49,26 +49,18 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> googleLogin(@RequestBody GoogleOrGithubLoginRequest googleRequest,
             HttpServletRequest request) {
 
-        LoginType loginType = LoginType.GOOGLE;
         String ipAddress = HttpUtils.getRequestIP(request);
         String userAgent = HttpUtils.getUserAgent(request);
 
         GoogleUser userInfo = authService.googleAuthorizationCodeExchange(googleRequest.getCode(),
                 googleRequest.getCodeVerifier());
         User user = userService.getUserByEmail(userInfo.getEmail());
-        String accessToken = null;
-        String refreshToken = null;
-        if (user != null) {
-            customLogger.info("Existing user logged in: {}", user.getEmail());
-        } else {
-            customLogger.info("New user registration: {}", userInfo.getEmail());
-            user = UserMapper.toEntity(userInfo, LoginType.GOOGLE);
-            user = userService.createUser(user);
-        }
-        accessToken = authService.generateJwtToken(user);
-        refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
+
+        getOrCreateUser(userInfo, LoginType.GOOGLE);
+        String accessToken = authService.generateJwtToken(user);
+        String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieFrom(refreshToken).toString())
+                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
                 .body(Map.of(
                         MESSAGE, "Login Successful",
                         ACCESS_TOKEN, accessToken,
@@ -85,23 +77,11 @@ public class AuthController {
         GitHubUser userInfo = authService.githubAuthorizationCodeExchange(githubRequest.getCode(),
                 githubRequest.getCodeVerifier());
 
-        User user = null;
-        if (userInfo.getEmail() != null && !userInfo.getEmail().isBlank()) {
-            user = userService.getUserByEmail(userInfo.getEmail());
-        }
-        String accessToken = null;
-        String refreshToken = null;
-        if (user != null) {
-            customLogger.info("Existing user logged in: {}", user.getEmail());
-        } else {
-            customLogger.info("New user registration: {}", userInfo.getEmail());
-            user = UserMapper.toEntity(userInfo, LoginType.GITHUB);
-            user = userService.createUser(user);
-        }
-        accessToken = authService.generateJwtToken(user);
-        refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
+        User user = getOrCreateUser(userInfo, LoginType.GITHUB);
+        String accessToken = authService.generateJwtToken(user);
+        String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieFrom(refreshToken).toString())
+                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
                 .body(Map.of(
                         MESSAGE, "Login Successful",
                         ACCESS_TOKEN, accessToken,
@@ -115,7 +95,7 @@ public class AuthController {
             refreshTokenService.deleteRefreshToken(refreshToken);
         }
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-                clearRefreshTokenCookieFrom().toString())
+                clearRefreshTokenCookieForm().toString())
                 .body(Map.of(MESSAGE, "Logout successful"));
     }
 
@@ -142,7 +122,7 @@ public class AuthController {
         String newAccessToken = authService.generateJwtToken(user);
 
         if (result.isRotated()) {
-            cookie = generateRefreshTokenCookieFrom(result.token());
+            cookie = generateRefreshTokenCookieForm(result.token());
         }
 
         if (cookie != null) {
@@ -157,7 +137,7 @@ public class AuthController {
             String accessToken) {
     }
 
-    public ResponseCookie generateRefreshTokenCookieFrom(String validRefreshToken) {
+    public ResponseCookie generateRefreshTokenCookieForm(String validRefreshToken) {
         return ResponseCookie.from("refreshToken", validRefreshToken)
                 .httpOnly(false)
                 .secure(false)
@@ -167,7 +147,7 @@ public class AuthController {
                 .build();
     }
 
-    public ResponseCookie clearRefreshTokenCookieFrom() {
+    public ResponseCookie clearRefreshTokenCookieForm() {
         return ResponseCookie.from("refreshToken", "")
                 .httpOnly(false)
                 .secure(false)

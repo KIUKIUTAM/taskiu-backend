@@ -14,7 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.tavinki.taskiu.common.properties.AppSecurityProperties;
 import com.tavinki.taskiu.common.properties.CorsProperties;
-import com.tavinki.taskiu.common.properties.CspProperties;
+//import com.tavinki.taskiu.common.properties.CspProperties;
 import com.tavinki.taskiu.modules.auth.security.JwtAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     private final CorsProperties corsProperties;
 
-    private final CspProperties cspProperties;
+    // private final CspProperties cspProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

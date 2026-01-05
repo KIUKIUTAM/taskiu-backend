@@ -44,7 +44,6 @@ public class UserMapper {
                 return userBuilder.auth(authBuilder.build()).build();
         }
 
-        // 通用的更新 Auth 方法 (處理舊用戶綁定新登入方式)
         public static void updateAuthInfo(User user, OAuth2UserInfo userInfo, LoginType loginType) {
                 if (user.getAuth() == null) {
                         user.setAuth(User.Auth.builder().build());
