@@ -5,6 +5,8 @@ import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +38,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void updateUser(User user) {
+    public void updateUser(@NonNull User user) {
         userRepository.save(user);
     }
 
@@ -47,7 +49,7 @@ public class UserService {
         }
     }
 
-    public User getUserById(String userId) {
+    public User getUserById(@NonNull String userId) {
         return userRepository.findById(userId).orElse(null);
     }
 }

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -17,15 +18,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tavinki.taskiu.common.enums.LoginType;
 import com.tavinki.taskiu.common.enums.RoleType;
 import com.tavinki.taskiu.common.exception.AuthException;
+import com.tavinki.taskiu.common.exception.EmailExistsAtRegistrationException;
 import com.tavinki.taskiu.common.properties.GoogleLoginProperties;
 import com.tavinki.taskiu.common.properties.GithubLoginProperties;
 import com.tavinki.taskiu.common.utils.JwtUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
+import com.tavinki.taskiu.modules.user.mapper.UserMapper;
+import com.tavinki.taskiu.modules.user.service.UserService;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +43,11 @@ public class AuthService {
 
     private final RestClient.Builder restClientBuilder;
 
+    private final UserService userService;
+
     private final JwtUtils jwtUtils;
+
+    private final PasswordEncoder passwordEncoder;
 
     private final GoogleLoginProperties googleLoginProperties;
     private final GithubLoginProperties githubLoginProperties;
@@ -146,9 +156,8 @@ public class AuthService {
                                 .filter(e -> Boolean.TRUE.equals(e.get("verified")))
                                 .map(e -> (String) e.get("email"))
                                 .findFirst()
-                                .orElse(null); // 如果真的找不到，就保持 null
+                                .orElse(null);
 
-                        // 只有抓到了才覆蓋，沒抓到就維持原樣 (可能是 null 或 noreply)
                         if (primaryEmail != null) {
                             userInfo.setEmail(primaryEmail);
                         }
@@ -168,8 +177,62 @@ public class AuthService {
 
     }
 
+    // Validate user credentials for email/password login
+    public User validateUserCredentials(String email, String rawPassword) {
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            throw new AuthException("User not found");
+        }
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new AuthException("Invalid credentials");
+        }
+        return user;
+    }
+
+    public User registerNewUser(String email, String rawPassword) {
+        if (userService.getUserByEmail(email) != null) {
+            throw new EmailExistsAtRegistrationException("User already exists");
+        }
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+        User newUser = User.builder()
+                .email(email)
+                .password(encodedPassword)
+                .name((email.split("@")[0]))
+                .role(RoleType.USER)
+                .isVerified(false)
+                .isBanned(false)
+                .build();
+
+        return userService.createUser(newUser);
+    }
+
+    public User getOrCreateUserForOAuth(OAuth2UserInfo userInfo, LoginType loginType) {
+
+        User user = userService.getUserByEmail(userInfo.getEmail());
+
+        if (user != null) {
+            customLogger.info("Existing user logged in: {}", user.getEmail());
+
+            UserMapper.updateAuthInfo(user, userInfo, loginType);
+
+            userService.updateUser(user);
+
+        } else {
+            customLogger.info("New user registration via {}: {}", loginType, userInfo.getEmail());
+
+            user = UserMapper.toEntity(userInfo, loginType);
+            // Only OAuth2 users are considered verified
+            user.setVerified(true);
+            user.setBanned(false);
+            user = userService.createUser(user);
+        }
+
+        return user;
+    }
+
     public String generateJwtToken(User user) {
-        return jwtUtils.generateToken(user.getId(), user.getName(), user.getEmail(), user.getPicture(), user.getRole());
+        return jwtUtils.generateToken(user.getId(), user.getName(), user.getEmail(), user.getPicture(), user.getRole(),
+                user.isVerified(), user.isBanned());
     }
 
     // authenticate

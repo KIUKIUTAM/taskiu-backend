@@ -43,6 +43,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(errorBody);
     }
 
+    // todo: react the following code after implementing registration feature
+    @ExceptionHandler(EmailExistsAtRegistrationException.class)
+    public ProblemDetail handleEmailExists(EmailExistsAtRegistrationException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage());
+
+        problem.setTitle("Email Already Exists");
+
+        problem.setType(Objects.requireNonNull(URI.create("urn:taskiu:errors:email-exists")));
+
+        problem.setProperty("timestamp", System.currentTimeMillis());
+
+        return problem;
+    }
+
     // 4. 攔截所有未知的錯誤 (兜底)
     // Debug only: print stack trace
     @ExceptionHandler(Exception.class)

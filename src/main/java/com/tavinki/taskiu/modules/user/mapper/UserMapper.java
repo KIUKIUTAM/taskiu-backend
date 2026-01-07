@@ -44,6 +44,7 @@ public class UserMapper {
                 return userBuilder.auth(authBuilder.build()).build();
         }
 
+        // update existing User entity with new OAuth2 info
         public static void updateAuthInfo(User user, OAuth2UserInfo userInfo, LoginType loginType) {
                 if (user.getAuth() == null) {
                         user.setAuth(User.Auth.builder().build());

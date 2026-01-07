@@ -23,12 +23,15 @@ public class JwtUtils {
 
     private final AppTokenProperties appTokenProperties;
 
-    public String generateToken(String userId, String name, String email, String picture, RoleType role) {
+    public String generateToken(String userId, String name, String email, String picture, RoleType role,
+            boolean isVerified, boolean isBanned) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         claims.put("name", name);
         claims.put("email", email);
         claims.put("picture", picture);
+        claims.put("isVerified", isVerified);
+        claims.put("isBanned", isBanned);
         return createToken(claims, userId);
     }
 
