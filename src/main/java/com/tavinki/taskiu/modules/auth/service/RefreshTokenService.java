@@ -1,6 +1,7 @@
 package com.tavinki.taskiu.modules.auth.service;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,7 +74,7 @@ public class RefreshTokenService {
                 .ipAddress(ipAddress)
                 .userAgent(userAgent)
                 .build();
-        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(Objects.requireNonNull(refreshToken));
     }
 
     public void deleteRefreshToken(String token) {

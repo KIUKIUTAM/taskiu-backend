@@ -71,7 +71,7 @@ public class AuthService {
         try {
             Map<String, Object> response = restClient.post()
                     .uri(Objects.requireNonNull(googleLoginProperties.getTokenUri()))
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .contentType(Objects.requireNonNull(MediaType.APPLICATION_FORM_URLENCODED))
                     .body(formData)
                     .retrieve()
                     .body(mapType);
@@ -114,7 +114,7 @@ public class AuthService {
         Map<String, Object> tokenResponse = restClient.post()
                 .uri("https://github.com/login/oauth/access_token")
                 .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .contentType(Objects.requireNonNull((MediaType.APPLICATION_FORM_URLENCODED)))
                 .body(formData)
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {
