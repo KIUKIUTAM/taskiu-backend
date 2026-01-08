@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import lombok.NonNull;
+import org.springframework.lang.NonNull;
 
 @Service
 public class RedisService {

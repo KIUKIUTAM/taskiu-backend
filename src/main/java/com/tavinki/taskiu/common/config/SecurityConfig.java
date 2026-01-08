@@ -82,9 +82,4 @@ public class SecurityConfig {
 
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        // BCrypt 是目前最推薦的密碼雜湊算法
-        return new BCryptPasswordEncoder();
-    }
 }

@@ -9,6 +9,7 @@ public class HttpUtils {
     }
 
     private static final String[] IP_HEADERS = {
+            "CF-Connecting-IP",
             "X-Forwarded-For",
             "Proxy-Client-IP",
             "WL-Proxy-Client-IP",
