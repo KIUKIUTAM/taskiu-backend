@@ -1,0 +1,49 @@
+<configuration>
+
+    <!-- 1. 定義【系統通用】的 Appender (輸出目的地) -->
+    <appender name="SYSTEM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 設定檔案路徑與名稱 -->
+        <file>logs/system/app.log</file>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天換一個新檔案 -->
+            <fileNamePattern>logs/system/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory> <!-- 保留30天 -->
+        </rollingPolicy>
+        
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 2. 定義【Auth 專用】的 Appender -->
+    <appender name="AUTH_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 這裡指定 Auth Log 要去的特定資料夾與檔名 -->
+        <file>logs/auth/login-audit.log</file>
+        
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/auth/login-audit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory> <!-- 重要稽核紀錄保留久一點 -->
+        </rollingPolicy>
+        
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [AUTH] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ========================================== -->
+    <!-- 3. 設定 Log 路由規則 (最重要的地方) -->
+    <!-- ========================================== -->
+
+    <!-- 規則 A: 針對 AuthController，使用 AUTH_FILE Appender -->
+    <!-- additivity="false" 代表：只寫入這個檔案，不要再往上傳遞給 Root (避免重複寫入系統 Log) -->
+    <logger name="com.tavinki.taskiu.modules.auth" level="INFO" additivity="false">
+        <appender-ref ref="AUTH_FILE" />
+    </logger>
+
+    <!-- 規則 B: 其他所有的 Log，預設走 SYSTEM_FILE -->
+    <root level="INFO">
+        <appender-ref ref="SYSTEM_FILE" />
+    </root>
+
+</configuration>
