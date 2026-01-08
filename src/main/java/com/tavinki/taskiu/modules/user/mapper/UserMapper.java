@@ -67,6 +67,11 @@ public class UserMapper {
                                                         .build());
                                 }
                                 break;
+                        case EMAIL:
+                                // 如果有其他登入方式，可以在這裡處理
+                                break;
+                        default:
+                                throw new IllegalArgumentException("Unsupported login type: " + loginType);
                 }
         }
 
