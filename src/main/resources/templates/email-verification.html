@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            /* 在這裡加入了邊框設定 */
+            border: 1px solid #e6e6e6; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .header {
+            background-color: #333333; /* 品牌主色調 */
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .verification-code {
+            background-color: #f0f4f8;
+            border: 1px dashed #4A90E2;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #4A90E2;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+            border-top: 1px solid #eeeeee;
+        }
+        .warning {
+            font-size: 13px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Verification your email</h1>
+        </div>
+        <div class="content">
+            <p>Dear user,</p>
+            <p>Thank you for registering/using our service. To ensure the security of your account, please use the following verification code to complete the verification process:</p>
+            
+            <!-- 驗證碼區塊 -->
+            <div class="verification-code">
+                [[${code}]]
+            </div>
+            
+            <p class="warning">This verification code will expire in <strong>5 minutes</strong>. Please do not share this code with anyone.</p>
+            <p>If you did not request this verification code, please ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 Taskiu. All rights reserved.</p>
+            <p>This is an automated message, please do not reply directly.</p>
+        </div>
+    </div>
+</body>
+</html>
