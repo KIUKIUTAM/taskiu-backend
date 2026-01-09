@@ -1,16 +1,26 @@
 package com.tavinki.taskiu.modules.email.controller;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tavinki.taskiu.modules.user.entity.User;
+
+import com.tavinki.taskiu.modules.auth.service.AuthService;
+
 import com.tavinki.taskiu.modules.email.service.EmailService;
+import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
 @RestController
 @RequestMapping("/email")
@@ -20,32 +30,65 @@ public class EmailVerifyController {
     private static final String MESSAGE = "message";
     private final Logger customLogger = LoggerFactory.getLogger(EmailVerifyController.class);
 
+    private static final String ACCESS_TOKEN = "accessToken";
+
     private final EmailService emailService;
 
-    @PostMapping("/sendEmail")
-    public ResponseEntity<Map<String, Object>> sendEmail(@RequestBody @NonNull String toEmail) {
+    private final AuthService authService;
+
+    @PostMapping("/send-verify-email")
+    public ResponseEntity<Map<String, Object>> sendEmail(@AuthenticationPrincipal UserResponseDto user) {
+        if (user == null || user.getEmail() == null) {
+            customLogger.warn("Unauthorized attempt to send verification email.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(MESSAGE, "User is not authenticated"));
+        }
+        String toEmail = Objects.requireNonNull(user.getEmail());
         try {
+            // Check rate limiting before sending email (1min per email)
+            if (emailService.limitingSendEmail(toEmail)) {
+                customLogger.warn("Email sending rate limit exceeded for email: {}", toEmail);
+                return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                        .body(Map.of(MESSAGE, "Too many requests. Please try again later."));
+            }
+            // Send verification code to the email
             emailService.sendVerificationCode(toEmail);
             customLogger.info("Verification code sent to email: {}", toEmail);
             return ResponseEntity.ok(Map.of(MESSAGE, "sent successfully"));
         } catch (Exception e) {
             e.printStackTrace();
             customLogger.error("Failed to send verification code to email: {}", toEmail, e);
-            return ResponseEntity.status(500).body(Map.of(MESSAGE, "sending failed"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(MESSAGE, "sending failed"));
         }
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<Map<String, Object>> verifyEmail(@RequestBody @NonNull String toEmail,
-            @RequestBody @NonNull String code) {
+    public ResponseEntity<Map<String, Object>> verifyEmail(@AuthenticationPrincipal UserResponseDto user,
+            @RequestBody VerifyRequest request) {
 
-        boolean isValid = emailService.verifyCode(toEmail, code);
-        if (isValid) {
+        if (user == null || user.getEmail() == null) {
+            customLogger.warn("Unauthorized attempt to send verification email.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(MESSAGE, "User is not authenticated"));
+        }
+        String toEmail = Objects.requireNonNull(user.getEmail());
+        // Process verification and set the email as verified if successful
+        User verifiedUser = emailService.verifyProcess(toEmail, request.getCode());
+        if (verifiedUser != null) {
             customLogger.info("Email verification successful for email: {}", toEmail);
-            return ResponseEntity.ok(Map.of(MESSAGE, "verification successful"));
+            String accessToken = authService.generateJwtToken(verifiedUser);
+            return ResponseEntity.ok(Map.of(MESSAGE, "verification successful", ACCESS_TOKEN, accessToken));
         } else {
             customLogger.warn("Email verification failed for email: {}", toEmail);
-            return ResponseEntity.status(400).body(Map.of(MESSAGE, "verification code is incorrect or has expired"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(MESSAGE, "verification code is incorrect or has expired"));
         }
+    }
+
+    @Data
+    private static class VerifyRequest {
+        @NonNull
+        @JsonProperty("verify_code")
+        private String code;
     }
 }

@@ -38,9 +38,9 @@ public class User {
 
     private RoleType role;
 
-    private boolean isBanned;
+    private boolean banned;
 
-    private boolean isVerified;
+    private boolean verified;
 
     @CreatedDate
     private Instant createdAt;

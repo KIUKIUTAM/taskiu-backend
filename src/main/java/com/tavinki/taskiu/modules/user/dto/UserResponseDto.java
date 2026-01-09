@@ -13,6 +13,6 @@ public class UserResponseDto {
     private String name;
     private String picture;
     private RoleType role;
-    private boolean isVerified;
-    private boolean isBanned;
+    private boolean verified;
+    private boolean banned;
 }

@@ -11,30 +11,33 @@ import org.springframework.http.HttpHeaders;
 
 import com.tavinki.taskiu.common.enums.LoginType;
 import com.tavinki.taskiu.common.exception.InvalidRefreshTokenException;
+import com.tavinki.taskiu.common.properties.DeployProperties;
 import com.tavinki.taskiu.common.utils.HttpUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.RegisterRequest;
 import com.tavinki.taskiu.modules.auth.dto.EmailLoginRequest;
-import com.tavinki.taskiu.modules.auth.dto.EmailRegisterRequest;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.auth.dto.GoogleOrGithubLoginRequest;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService.RefreshTokenResult;
+import com.tavinki.taskiu.modules.email.service.EmailService;
+import com.tavinki.taskiu.modules.turnstile.dto.TurnstileResponse;
 import com.tavinki.taskiu.modules.turnstile.service.TurnstileService;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Objects;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -44,9 +47,13 @@ public class AuthController {
 
         private final AuthService authService;
 
+        private final EmailService emailService;
+
         private final RefreshTokenService refreshTokenService;
 
         private final TurnstileService turnstileService;
+
+        private final DeployProperties deployProperties;
 
         private static final String MESSAGE = "message";
 
@@ -70,7 +77,9 @@ public class AuthController {
                 customLogger.info("Google login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
+                                .header(HttpHeaders.SET_COOKIE,
+                                                refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
+                                                                .toString())
                                 .body(Map.of(
                                                 MESSAGE, LOGIN_SUCCESS,
                                                 ACCESS_TOKEN, accessToken,
@@ -93,7 +102,9 @@ public class AuthController {
                 customLogger.info("GitHub login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
+                                .header(HttpHeaders.SET_COOKIE,
+                                                refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
+                                                                .toString())
                                 .body(Map.of(
                                                 MESSAGE, LOGIN_SUCCESS,
                                                 ACCESS_TOKEN, accessToken,
@@ -111,7 +122,9 @@ public class AuthController {
                 customLogger.info("Email login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
+                                .header(HttpHeaders.SET_COOKIE,
+                                                refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
+                                                                .toString())
                                 .body(Map.of(
                                                 MESSAGE, LOGIN_SUCCESS,
                                                 ACCESS_TOKEN, accessToken,
@@ -119,20 +132,40 @@ public class AuthController {
         }
 
         @PostMapping("register")
-        public ResponseEntity<Map<String, Object>> emailRegister(@RequestBody EmailRegisterRequest registerRequest,
+        public ResponseEntity<Map<String, Object>> emailRegister(
+                        @Valid @RequestBody RegisterRequest registerRequest,
                         HttpServletRequest request) {
 
-                // error handling is done in GlobalExceptionHandler
                 String ipAddress = HttpUtils.getRequestIP(request);
                 String userAgent = HttpUtils.getUserAgent(request);
-                turnstileService.validateToken(ACCESS_TOKEN, ipAddress);
-                User user = authService.registerNewUser(registerRequest.getEmail(), registerRequest.getPassword());
+
+                customLogger.info("Registration attempt from IP: {}, turnstile token: {}", ipAddress,
+                                registerRequest.getTurnstileToken());
+                TurnstileResponse turnstileResponse = turnstileService
+                                .validateToken(registerRequest.getTurnstileToken(), ipAddress);
+                customLogger.info("Turnstile response: {}", turnstileResponse);
+                String expectedDomain = getDomainFromUrl(deployProperties.getExpectedHost());
+                customLogger.info("Expected domain for Turnstile verification: {}", expectedDomain);
+                if (!turnstileResponse.isSuccess()
+                                || !turnstileResponse.getHostname().equals(expectedDomain)) {
+                        customLogger.warn("Turnstile verification failed during registration from IP: {}, errors: {}",
+                                        ipAddress,
+                                        turnstileResponse.getErrorCodes());
+                        return ResponseEntity.status(400).body(Map.of(MESSAGE, "Turnstile verification failed"));
+                }
+
+                String email = Objects.requireNonNull(registerRequest.getEmail());
+                String rawPassword = Objects.requireNonNull(registerRequest.getPassword());
+                User user = authService.registerNewUser(email, rawPassword);
+                emailService.sendVerificationCode(email);
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
                 customLogger.info("Email registration successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, generateRefreshTokenCookieForm(refreshToken).toString())
+                                .header(HttpHeaders.SET_COOKIE,
+                                                refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
+                                                                .toString())
                                 .body(Map.of(MESSAGE, "Registration successful",
                                                 ACCESS_TOKEN, accessToken,
                                                 LOGIN_TYPE, LoginType.EMAIL));
@@ -147,8 +180,12 @@ public class AuthController {
                 }
                 customLogger.info("Logout successful for refresh token: {}", refreshToken);
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
-                                clearRefreshTokenCookieForm().toString())
+                                refreshTokenService.clearRefreshTokenCookieForm().toString())
                                 .body(Map.of(MESSAGE, "Logout successful"));
+        }
+
+        public record TokenResponse(
+                        String accessToken) {
         }
 
         @PostMapping("/refresh-token")
@@ -172,11 +209,14 @@ public class AuthController {
                 }
                 User user = userService.getUserById(Objects.requireNonNull(result.userId()));
 
+                if (user == null) {
+                        throw new InvalidRefreshTokenException("User not found for the given refresh token");
+                }
                 String newAccessToken = authService.generateJwtToken(user);
 
                 // If the token was rotated, set a new refresh token cookie
                 if (result.isRotated()) {
-                        cookie = generateRefreshTokenCookieForm(result.token());
+                        cookie = refreshTokenService.generateRefreshTokenCookieForm(result.token());
                 }
 
                 if (cookie != null) {
@@ -187,28 +227,16 @@ public class AuthController {
                 return ResponseEntity.ok().body(new TokenResponse(newAccessToken));
         }
 
-        public record TokenResponse(
-                        String accessToken) {
+        private String getDomainFromUrl(String url) {
+                try {
+                        // 如果 url 不包含 http/https，URI 解析可能會出錯，這裡做個簡單判斷
+                        if (!url.startsWith("http")) {
+                                return url;
+                        }
+                        return new URI(url).getHost(); // 會把 https://tavinki.com 變成 tavinki.com
+                } catch (URISyntaxException e) {
+                        // 錯誤處理或是直接回傳原字串
+                        return url;
+                }
         }
-
-        public ResponseCookie generateRefreshTokenCookieForm(String validRefreshToken) {
-                return ResponseCookie.from("refreshToken", validRefreshToken)
-                                .httpOnly(false)
-                                .secure(false)
-                                .path("/")
-                                .maxAge(7L * 24 * 60 * 60)
-                                .sameSite("Lax")
-                                .build();
-        }
-
-        public ResponseCookie clearRefreshTokenCookieForm() {
-                return ResponseCookie.from("refreshToken", "")
-                                .httpOnly(false)
-                                .secure(false)
-                                .path("/")
-                                .maxAge(0L)
-                                .sameSite("Lax")
-                                .build();
-        }
-
 }

@@ -3,8 +3,10 @@ package com.tavinki.taskiu.modules.user.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.client.result.UpdateResult;
 import com.tavinki.taskiu.modules.user.entity.User;
 
 import java.util.List;
@@ -20,5 +22,4 @@ public interface UserRepository extends MongoRepository<User, String> {
     // ?0 代表第一個參數
     @Query("{ 'name' : ?0 }")
     List<User> findUsersByNameCustom(String name);
-
 }

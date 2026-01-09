@@ -1,17 +1,18 @@
 
 package com.tavinki.taskiu.common.test.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.lang.NonNull;
 
 @Service
+@RequiredArgsConstructor
 public class RedisService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     // Save data
     public void save(@NonNull String key, @NonNull Object value) {

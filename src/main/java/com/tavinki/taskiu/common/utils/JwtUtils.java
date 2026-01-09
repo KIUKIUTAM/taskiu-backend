@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class JwtUtils {
         claims.put("name", name);
         claims.put("email", email);
         claims.put("picture", picture);
-        claims.put("isVerified", isVerified);
-        claims.put("isBanned", isBanned);
+        claims.put("verified", isVerified);
+        claims.put("banned", isBanned);
         return createToken(claims, userId);
     }
 
@@ -99,4 +100,20 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public Optional<UserResponseDto> extractUserFromToken(String jwt) {
+
+        Claims claims = getClaims(jwt).orElse(null);
+        if (claims == null) {
+            return Optional.empty();
+        }
+        return Optional.of(UserResponseDto.builder()
+                .id(claims.getSubject())
+                .name((String) claims.get("name"))
+                .email((String) claims.get("email"))
+                .picture((String) claims.get("picture"))
+                .role(RoleType.valueOf((String) claims.get("role")))
+                .banned((Boolean) claims.get("banned"))
+                .verified((Boolean) claims.get("verified"))
+                .build());
+    }
 }

@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import com.tavinki.taskiu.common.properties.AppTokenProperties;
@@ -65,6 +66,7 @@ public class RefreshTokenService {
             String userId) {
     }
 
+    // save to mongodb
     public void saveRefreshToken(String userId, String tokenString, Instant expiryDate, String ipAddress,
             String userAgent) {
         RefreshToken refreshToken = RefreshToken.builder()
@@ -79,5 +81,25 @@ public class RefreshTokenService {
 
     public void deleteRefreshToken(String token) {
         refreshTokenRepository.deleteByToken(token);
+    }
+
+    public ResponseCookie generateRefreshTokenCookieForm(String validRefreshToken) {
+        return ResponseCookie.from("refreshToken", validRefreshToken)
+                .httpOnly(false)
+                .secure(false)
+                .path("/")
+                .maxAge(7L * 24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+    }
+
+    public ResponseCookie clearRefreshTokenCookieForm() {
+        return ResponseCookie.from("refreshToken", "")
+                .httpOnly(false)
+                .secure(false)
+                .path("/")
+                .maxAge(0L)
+                .sameSite("Lax")
+                .build();
     }
 }

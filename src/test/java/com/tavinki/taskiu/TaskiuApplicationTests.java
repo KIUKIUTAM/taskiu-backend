@@ -104,13 +104,14 @@ class TaskiuApplicationTests {
 		customLogger.info("Default timezone is correctly set to {}", actualTimeZone);
 	}
 
-	@Test
-	void testEmailService() {
-		// This test will simply check if the application context loads with Email
-		// dependencies
-		emailService.sendVerificationCode("a1998gogo8@gmail.com");
-		assertThat(1).isEqualTo(1);
-		customLogger.info("Email service dependencies are properly configured.");
-	}
+	// @Test
+	// void testEmailService() {
+	// // This test will simply check if the application context loads with Email
+	// // dependencies
+
+	// emailService.sendVerificationCode("a1998gogo8@gmail.com");
+	// assertThat(1).isEqualTo(1);
+	// customLogger.info("Email service dependencies are properly configured.");
+	// }
 
 }

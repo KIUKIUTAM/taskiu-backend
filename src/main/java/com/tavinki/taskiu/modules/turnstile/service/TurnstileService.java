@@ -2,7 +2,10 @@ package com.tavinki.taskiu.modules.turnstile.service;
 
 import org.springframework.web.client.RestTemplate;
 
+import com.tavinki.taskiu.common.properties.CloudflareProperties;
 import com.tavinki.taskiu.modules.turnstile.dto.TurnstileResponse;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -10,7 +13,6 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,13 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TurnstileService {
 
-    @Value("${cloudflare.turnstile.secret-key}")
-    private String secretKey;
-
-    @Value("${cloudflare.turnstile.verify-url}")
-    private String verifyUrl;
+    private final CloudflareProperties cloudflareProperties;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -33,7 +32,7 @@ public class TurnstileService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("secret", secretKey);
+        params.add("secret", cloudflareProperties.getSecretKey());
         params.add("response", token);
         if (remoteip != null) {
             params.add("remoteip", remoteip);
@@ -43,7 +42,7 @@ public class TurnstileService {
 
         try {
             ResponseEntity<TurnstileResponse> response = restTemplate.postForEntity(
-                    Objects.requireNonNull(verifyUrl), request, TurnstileResponse.class);
+                    Objects.requireNonNull(cloudflareProperties.getVerifyUrl()), request, TurnstileResponse.class);
             return response.getBody();
         } catch (Exception e) {
             TurnstileResponse errorResponse = new TurnstileResponse();

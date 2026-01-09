@@ -1,5 +1,7 @@
 package com.tavinki.taskiu.modules.email.repository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,9 @@ public class VerificationCodeRepository {
     private final StringRedisTemplate redisTemplate;
 
     private static final String KEY_PREFIX = "verify:code:";
+
+    private static final Logger customLogger = LoggerFactory
+            .getLogger(VerificationCodeRepository.class);
 
     /**
      * saving verification code to redis with expiration time
@@ -57,7 +62,26 @@ public class VerificationCodeRepository {
      */
     public boolean verify(String email, String inputCode) {
         String storedCode = get(email);
+        customLogger.info("Stored code: {}, Input code: {}", storedCode, inputCode);
         // check if there is a value in Redis and if it matches the user input
         return storedCode != null && storedCode.equals(inputCode);
+    }
+
+    /**
+     * check if sending email is rate limited (e.g., only allow one email per
+     * minute)
+     * 
+     * @param email user email
+     * @return true if rate limited, false otherwise
+     */
+    public boolean isRateLimited(@NonNull String email) {
+        String key = "verify:limit:" + email;
+        Boolean exists = redisTemplate.hasKey(key);
+        if (Boolean.TRUE.equals(exists)) {
+            return true; // rate limited
+        } else {
+            redisTemplate.opsForValue().set(key, "1", Objects.requireNonNull(Duration.ofMinutes(1)));
+            return false;// not rate limited
+        }
     }
 }

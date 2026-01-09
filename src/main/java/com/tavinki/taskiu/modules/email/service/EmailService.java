@@ -2,7 +2,6 @@ package com.tavinki.taskiu.modules.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
@@ -16,9 +15,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.common.exception.EmailVerifyException;
 import com.tavinki.taskiu.common.utils.CodeGeneratorUtils;
 import com.tavinki.taskiu.modules.email.repository.VerificationCodeRepository;
+import com.tavinki.taskiu.modules.user.service.UserService;
 
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,8 @@ public class EmailService {
     private final TemplateEngine templateEngine;
 
     private final JavaMailSender mailSender;
+
+    private final UserService userService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -65,8 +68,18 @@ public class EmailService {
         }
     }
 
-    public boolean verifyCode(@NonNull String toEmail, @NonNull String inputCode) {
-        return verificationCodeRepository.verify(toEmail, inputCode);
+    public User verifyProcess(@NonNull String toEmail, @NonNull String inputCode) {
+
+        customLogger.info("Verifying code for email: {}, code: {}", toEmail, inputCode);
+        if (!verificationCodeRepository.verify(toEmail, inputCode))
+            return null;
+        verificationCodeRepository.delete(toEmail);
+
+        return userService.markEmailAsVerified(toEmail);
+    }
+
+    public boolean limitingSendEmail(@NonNull String toEmail) {
+        return verificationCodeRepository.isRateLimited(toEmail);
     }
 
 }

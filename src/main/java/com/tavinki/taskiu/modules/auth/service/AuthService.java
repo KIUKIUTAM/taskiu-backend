@@ -28,12 +28,10 @@ import com.tavinki.taskiu.common.utils.JwtUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
-import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.mapper.UserMapper;
 import com.tavinki.taskiu.modules.user.service.UserService;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -199,8 +197,8 @@ public class AuthService {
                 .password(encodedPassword)
                 .name((email.split("@")[0]))
                 .role(RoleType.USER)
-                .isVerified(false)
-                .isBanned(false)
+                .verified(false)
+                .banned(false)
                 .build();
 
         return userService.createUser(newUser);
@@ -233,22 +231,6 @@ public class AuthService {
     public String generateJwtToken(User user) {
         return jwtUtils.generateToken(user.getId(), user.getName(), user.getEmail(), user.getPicture(), user.getRole(),
                 user.isVerified(), user.isBanned());
-    }
-
-    // authenticate
-    public Optional<UserResponseDto> extractUserFromToken(String jwt) {
-
-        Claims claims = jwtUtils.getClaims(jwt).orElse(null);
-        if (claims == null) {
-            return Optional.empty();
-        }
-        return Optional.of(UserResponseDto.builder()
-                .id(claims.getSubject())
-                .name((String) claims.get("name"))
-                .email((String) claims.get("email"))
-                .picture((String) claims.get("picture"))
-                .role(RoleType.valueOf((String) claims.get("role")))
-                .build());
     }
 
 }
