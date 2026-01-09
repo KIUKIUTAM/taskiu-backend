@@ -157,7 +157,7 @@ public class AuthController {
                 String email = Objects.requireNonNull(registerRequest.getEmail());
                 String rawPassword = Objects.requireNonNull(registerRequest.getPassword());
                 User user = authService.registerNewUser(email, rawPassword);
-                emailService.sendVerificationCode(email);
+                emailService.sendVerificationCode(user.getEmail());
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
                 customLogger.info("Email registration successful for user: {}, IP: {}", user.getEmail(),
