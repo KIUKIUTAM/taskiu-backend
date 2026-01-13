@@ -12,8 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tavinki.taskiu.common.test.controller.RedisService;
-import com.tavinki.taskiu.modules.email.service.EmailService;
+import com.tavinki.taskiu.common.test.RedisService;
 
 @SpringBootTest
 class TaskiuApplicationTests {
@@ -27,9 +26,6 @@ class TaskiuApplicationTests {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	private EmailService emailService;
 
 	@Test
 	void contextLoads() {
@@ -103,15 +99,5 @@ class TaskiuApplicationTests {
 		assertEquals(expectedTimeZone, actualTimeZone);
 		customLogger.info("Default timezone is correctly set to {}", actualTimeZone);
 	}
-
-	// @Test
-	// void testEmailService() {
-	// // This test will simply check if the application context loads with Email
-	// // dependencies
-
-	// emailService.sendVerificationCode("a1998gogo8@gmail.com");
-	// assertThat(1).isEqualTo(1);
-	// customLogger.info("Email service dependencies are properly configured.");
-	// }
 
 }

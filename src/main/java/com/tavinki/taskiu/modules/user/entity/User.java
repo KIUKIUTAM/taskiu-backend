@@ -1,17 +1,17 @@
 package com.tavinki.taskiu.modules.user.entity;
 
+import jakarta.persistence.*; // 使用 Jakarta Persistence API
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.time.Instant;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.tavinki.taskiu.common.enums.RoleType;
 
@@ -19,13 +19,15 @@ import com.tavinki.taskiu.common.enums.RoleType;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Indexed(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String name;
@@ -34,25 +36,36 @@ public class User {
 
     private String password;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
     private Auth auth;
 
+    @Enumerated(EnumType.STRING)
     private RoleType role;
 
-    private boolean banned;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean banned = false;
 
-    private boolean verified;
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean verified = false;
 
-    @CreatedDate
+    @CreationTimestamp
+    @Column(updatable = false)
     private Instant createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     private Instant updatedAt;
+
+    // --- 內部類保持為 POJO (Plain Old Java Object) 即可 ---
+    // 建議加上 Serializable 接口
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Auth {
+    public static class Auth implements Serializable {
         private GoogleAuth google;
         private GithubAuth github;
     }
@@ -61,7 +74,7 @@ public class User {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GoogleAuth {
+    public static class GoogleAuth implements Serializable {
         private String id;
         private String email;
     }
@@ -70,9 +83,8 @@ public class User {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GithubAuth {
+    public static class GithubAuth implements Serializable {
         private String id;
         private String email;
     }
-
 }
