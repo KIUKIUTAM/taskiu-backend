@@ -3,7 +3,6 @@ package com.tavinki.taskiu.modules.auth.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
