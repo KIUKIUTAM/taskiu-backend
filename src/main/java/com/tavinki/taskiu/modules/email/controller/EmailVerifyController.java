@@ -1,6 +1,8 @@
 package com.tavinki.taskiu.modules.email.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -86,8 +88,10 @@ public class EmailVerifyController {
     }
 
     @Data
-    private static class VerifyRequest {
-        @NonNull
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class VerifyRequest {
+
         @JsonProperty("verify_code")
         private String code;
     }
