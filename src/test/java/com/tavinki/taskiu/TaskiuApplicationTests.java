@@ -71,8 +71,8 @@ class TaskiuApplicationTests {
 	void testRabbitMQSend() {
 		// This test will simply check if the application context loads with RabbitMQ
 		// dependencies
-		String queueName = "simple.queue";
-		String testMessage = "Hello, RabbitMQ!";
+		String queueName = "order_queue";
+		String testMessage = "Hello, Rabbit!";
 
 		rabbitTemplate.convertAndSend(queueName, testMessage);
 		customLogger.info("Sent message to RabbitMQ queue '{}': {}", queueName, testMessage);
