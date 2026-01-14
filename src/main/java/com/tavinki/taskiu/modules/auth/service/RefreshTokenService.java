@@ -21,6 +21,22 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AppTokenProperties appTokenProperties;
 
+    /**
+     * Process the provided refresh token.
+     * 
+     * @param refreshToken
+     * @param ipAddress
+     * @param userAgent
+     * @return RefreshTokenResult indicating the status of the token.
+     *         RefreshTokenResult contains:
+     *         <ul>
+     *         <li>token: the new token if rotated, or the same token if still
+     *         valid,</li>
+     *         <li>isRotated: boolean indicating if the token was rotated,</li>
+     *         <li>isValid: boolean indicating if the token is valid,</li>
+     *         <li>userId: the user ID associated with the token.</li>
+     *         </ul>
+     */
     public RefreshTokenResult processRefreshToken(String refreshToken, String ipAddress, String userAgent) {
 
         Optional<RefreshToken> tokenRecord = refreshTokenRepository.findByToken(refreshToken);
@@ -59,6 +75,14 @@ public class RefreshTokenService {
         return tokenString;
     }
 
+    /**
+     * Record to represent the result of processing a refresh token.
+     * 
+     * @param token     The new or existing refresh token.
+     * @param isRotated Indicates if the token was rotated.
+     * @param isValid   Indicates if the token is valid.
+     * @param userId    The user ID associated with the token.
+     */
     public record RefreshTokenResult(
             String token,
             boolean isRotated,
