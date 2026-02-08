@@ -78,3 +78,5 @@ application.properties
 application-*.yml
 application-*.yaml
 application-*.properties
+
+src/main/resources/application.yaml
