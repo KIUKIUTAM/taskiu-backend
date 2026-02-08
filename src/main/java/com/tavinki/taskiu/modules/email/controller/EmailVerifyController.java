@@ -1,10 +1,5 @@
 package com.tavinki.taskiu.modules.email.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Map;
 import java.util.Objects;
 
@@ -12,21 +7,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.tavinki.taskiu.modules.user.entity.User;
-
 import com.tavinki.taskiu.modules.auth.service.AuthService;
-
 import com.tavinki.taskiu.modules.email.service.EmailService;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
+import com.tavinki.taskiu.modules.user.entity.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/email")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class EmailVerifyController {
     private static final String MESSAGE = "message";

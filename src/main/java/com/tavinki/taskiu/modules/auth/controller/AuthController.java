@@ -1,23 +1,30 @@
 package com.tavinki.taskiu.modules.auth.controller;
 
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.tavinki.taskiu.common.enums.LoginType;
 import com.tavinki.taskiu.common.exception.InvalidRefreshTokenException;
 import com.tavinki.taskiu.common.properties.DeployProperties;
 import com.tavinki.taskiu.common.utils.HttpUtils;
-import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
-import com.tavinki.taskiu.modules.auth.dto.RegisterRequest;
 import com.tavinki.taskiu.modules.auth.dto.EmailLoginRequest;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.auth.dto.GoogleOrGithubLoginRequest;
+import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.RegisterRequest;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService.RefreshTokenResult;
@@ -29,15 +36,10 @@ import com.tavinki.taskiu.modules.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class AuthController {
 
