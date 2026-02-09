@@ -80,3 +80,9 @@ application-*.yaml
 application-*.properties
 
 src/main/resources/application.yaml
+
+
+.env
+.env.local
+.env.prod
+.env.*.local
