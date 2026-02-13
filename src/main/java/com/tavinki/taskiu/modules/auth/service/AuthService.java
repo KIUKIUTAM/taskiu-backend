@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,11 +31,12 @@ import com.tavinki.taskiu.modules.user.mapper.UserMapper;
 import com.tavinki.taskiu.modules.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
-    private static final Logger customLogger = LoggerFactory.getLogger(AuthService.class);
 
     private final RestClient.Builder restClientBuilder;
 
@@ -86,10 +86,10 @@ public class AuthService {
         } catch (HttpClientErrorException e) {
             String body = e.getResponseBodyAsString();
             String status = e.getStatusCode().toString();
-            customLogger.error("Google login failed: {} {}", status, body);
+            log.error("Google login failed: {} {}", status, body);
             throw new AuthException("Google login failed: " + status + " " + body, e);
         } catch (Exception e) {
-            customLogger.error("Internal Server Error", e);
+            log.error("Internal Server Error", e);
             throw new AuthException("Internal Server Error", e);
         }
     }
@@ -122,7 +122,7 @@ public class AuthService {
         }
 
         String accessToken = (String) tokenResponse.get("access_token");
-        GitHubUser userInfo = null;
+        GitHubUser userInfo;
         try {
             userInfo = restClient.get()
                     .uri("https://api.github.com/user")
@@ -165,10 +165,10 @@ public class AuthService {
         } catch (HttpClientErrorException e) {
             String body = e.getResponseBodyAsString();
             String status = e.getStatusCode().toString();
-            customLogger.error("GitHub login failed: {} {}", status, body);
+            log.error("GitHub login failed: {} {}", status, body);
             throw new AuthException("GitHub login failed: " + status + " " + body, e);
         } catch (Exception e) {
-            customLogger.error("Failed to fetch user profile from GitHub", e);
+            log.error("Failed to fetch user profile from GitHub", e);
             throw new AuthException("Failed to fetch user profile from GitHub", e);
         }
 
@@ -208,14 +208,14 @@ public class AuthService {
         User user = userService.getUserByEmail(userInfo.getEmail());
 
         if (user != null) {
-            customLogger.info("Existing user logged in: {}", user.getEmail());
+            log.info("Existing user logged in: {}", user.getEmail());
 
             UserMapper.updateAuthInfo(user, userInfo, loginType);
 
             userService.updateUser(user);
 
         } else {
-            customLogger.info("New user registration via {}: {}", loginType, userInfo.getEmail());
+            log.info("New user registration via {}: {}", loginType, userInfo.getEmail());
 
             user = UserMapper.toEntity(userInfo, loginType);
             // Only OAuth2 users are considered verified

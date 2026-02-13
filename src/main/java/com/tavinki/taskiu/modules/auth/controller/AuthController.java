@@ -5,8 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +35,15 @@ import com.tavinki.taskiu.modules.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
-
-        private static final Logger customLogger = LoggerFactory.getLogger(AuthController.class);
 
         private final UserService userService;
 
@@ -76,7 +76,7 @@ public class AuthController {
                 User user = authService.getOrCreateUserForOAuth(userInfo, LoginType.GOOGLE);
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                customLogger.info("Google login successful for user: {}, IP: {}", user.getEmail(),
+                log.info("Google login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
@@ -101,7 +101,7 @@ public class AuthController {
                 User user = authService.getOrCreateUserForOAuth(userInfo, LoginType.GITHUB);
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                customLogger.info("GitHub login successful for user: {}, IP: {}", user.getEmail(),
+                log.info("GitHub login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
@@ -121,7 +121,7 @@ public class AuthController {
                 User user = authService.validateUserCredentials(loginRequest.getEmail(), loginRequest.getPassword());
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                customLogger.info("Email login successful for user: {}, IP: {}", user.getEmail(),
+                log.info("Email login successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
@@ -141,16 +141,16 @@ public class AuthController {
                 String ipAddress = HttpUtils.getRequestIP(request);
                 String userAgent = HttpUtils.getUserAgent(request);
 
-                customLogger.info("Registration attempt from IP: {}, turnstile token: {}", ipAddress,
+                log.info("Registration attempt from IP: {}, turnstile token: {}", ipAddress,
                                 registerRequest.getTurnstileToken());
                 TurnstileResponse turnstileResponse = turnstileService
                                 .validateToken(registerRequest.getTurnstileToken(), ipAddress);
-                customLogger.info("Turnstile response: {}", turnstileResponse);
+                log.info("Turnstile response: {}", turnstileResponse);
                 String expectedDomain = getDomainFromUrl(deployProperties.getExpectedHost());
-                customLogger.info("Expected domain for Turnstile verification: {}", expectedDomain);
+                log.info("Expected domain for Turnstile verification: {}", expectedDomain);
                 if (!turnstileResponse.isSuccess()
                                 || !turnstileResponse.getHostname().equals(expectedDomain)) {
-                        customLogger.warn("Turnstile verification failed during registration from IP: {}, errors: {}",
+                        log.warn("Turnstile verification failed during registration from IP: {}, errors: {}",
                                         ipAddress,
                                         turnstileResponse.getErrorCodes());
                         return ResponseEntity.status(400).body(Map.of(MESSAGE, "Turnstile verification failed"));
@@ -162,7 +162,7 @@ public class AuthController {
                 emailService.sendVerificationCode(user.getEmail());
                 String accessToken = authService.generateJwtToken(user);
                 String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                customLogger.info("Email registration successful for user: {}, IP: {}", user.getEmail(),
+                log.info("Email registration successful for user: {}, IP: {}", user.getEmail(),
                                 ipAddress);
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
@@ -177,10 +177,10 @@ public class AuthController {
         public ResponseEntity<Map<String, Object>> logoutUser(
                         @CookieValue(value = "refreshToken", required = false) String refreshToken) {
                 if (refreshToken != null) {
-                        customLogger.info("Logout attempt with refresh token: {}", refreshToken);
+                        log.info("Logout attempt with refresh token: {}", refreshToken);
                         refreshTokenService.deleteRefreshToken(refreshToken);
                 }
-                customLogger.info("Logout successful for refresh token: {}", refreshToken);
+                log.info("Logout successful for refresh token: {}", refreshToken);
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                                 refreshTokenService.clearRefreshTokenCookieForm().toString())
                                 .body(Map.of(MESSAGE, "Logout successful"));

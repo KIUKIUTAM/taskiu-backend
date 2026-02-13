@@ -3,11 +3,10 @@ package com.tavinki.taskiu.modules.email.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,9 +24,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
-    private static final Logger customLogger = LoggerFactory.getLogger(EmailService.class);
 
     private final VerificationCodeRepository verificationCodeRepository;
 
@@ -60,7 +59,7 @@ public class EmailService {
             helper.setText(Objects.requireNonNull(htmlContent), true);
 
             mailSender.send(message);
-            customLogger.info("HTML verification email sent to: {}", toEmail);
+            log.info("HTML verification email sent to: {}", toEmail);
 
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -70,7 +69,7 @@ public class EmailService {
 
     public User verifyProcess(@NonNull String toEmail, @NonNull String inputCode) {
 
-        customLogger.info("Verifying code for email: {}, code: {}", toEmail, inputCode);
+        log.info("Verifying code for email: {}, code: {}", toEmail, inputCode);
         if (!verificationCodeRepository.verify(toEmail, inputCode))
             return null;
         verificationCodeRepository.delete(toEmail);

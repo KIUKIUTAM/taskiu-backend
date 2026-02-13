@@ -3,8 +3,6 @@ package com.tavinki.taskiu.modules.email.controller;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,13 +21,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/email")
 @RequiredArgsConstructor
+@Slf4j
 public class EmailVerifyController {
     private static final String MESSAGE = "message";
-    private final Logger customLogger = LoggerFactory.getLogger(EmailVerifyController.class);
 
     private static final String ACCESS_TOKEN = "accessToken";
 
@@ -40,7 +38,7 @@ public class EmailVerifyController {
     @PostMapping("/send-verify-email")
     public ResponseEntity<Map<String, Object>> sendEmail(@AuthenticationPrincipal UserResponseDto user) {
         if (user == null || user.getEmail() == null) {
-            customLogger.warn("Unauthorized attempt to send verification email.");
+            log.warn("Unauthorized attempt to send verification email.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(MESSAGE, "User is not authenticated"));
         }
@@ -48,16 +46,16 @@ public class EmailVerifyController {
         try {
             // Check rate limiting before sending email (1min per email)
             if (emailService.limitingSendEmail(toEmail)) {
-                customLogger.warn("Email sending rate limit exceeded for email: {}", toEmail);
+                log.warn("Email sending rate limit exceeded for email: {}", toEmail);
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                         .body(Map.of(MESSAGE, "Too many requests. Please try again later."));
             }
             // Send verification code to the email
             emailService.sendVerificationCode(toEmail);
-            customLogger.info("Verification code sent to email: {}", toEmail);
+            log.info("Verification code sent to email: {}", toEmail);
             return ResponseEntity.ok(Map.of(MESSAGE, "sent successfully"));
         } catch (Exception e) {
-            customLogger.error("Failed to send verification code to email: {}", toEmail, e);
+            log.error("Failed to send verification code to email: {}", toEmail, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(MESSAGE, "sending failed"));
         }
     }
@@ -67,7 +65,7 @@ public class EmailVerifyController {
             @RequestBody VerifyRequest request) {
 
         if (user == null || user.getEmail() == null) {
-            customLogger.warn("Unauthorized attempt to send verification email.");
+            log.warn("Unauthorized attempt to send verification email.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(MESSAGE, "User is not authenticated"));
         }
@@ -75,11 +73,11 @@ public class EmailVerifyController {
         // Process verification and set the email as verified if successful
         User verifiedUser = emailService.verifyProcess(toEmail, request.getCode());
         if (verifiedUser != null) {
-            customLogger.info("Email verification successful for email: {}", toEmail);
+            log.info("Email verification successful for email: {}", toEmail);
             String accessToken = authService.generateJwtToken(verifiedUser);
             return ResponseEntity.ok(Map.of(MESSAGE, "verification successful", ACCESS_TOKEN, accessToken));
         } else {
-            customLogger.warn("Email verification failed for email: {}", toEmail);
+            log.warn("Email verification failed for email: {}", toEmail);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of(MESSAGE, "verification code is incorrect or has expired"));
         }

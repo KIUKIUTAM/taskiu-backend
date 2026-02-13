@@ -1,26 +1,23 @@
 package com.tavinki.taskiu.modules.email.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class VerificationCodeRepository {
 
     private final StringRedisTemplate redisTemplate;
 
     private static final String KEY_PREFIX = "verify:code:";
-
-    private static final Logger customLogger = LoggerFactory
-            .getLogger(VerificationCodeRepository.class);
 
     /**
      * saving verification code to redis with expiration time
@@ -62,7 +59,7 @@ public class VerificationCodeRepository {
      */
     public boolean verify(String email, String inputCode) {
         String storedCode = get(email);
-        customLogger.info("Stored code: {}, Input code: {}", storedCode, inputCode);
+        log.info("Stored code: {}, Input code: {}", storedCode, inputCode);
         // check if there is a value in Redis and if it matches the user input
         return storedCode != null && storedCode.equals(inputCode);
     }

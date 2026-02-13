@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +20,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * JWT 認證過濾器 (JWT Authentication Filter)
@@ -50,11 +49,10 @@ import java.util.Optional;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-
-    private static final Logger customLogger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
     protected void doFilterInternal(
@@ -90,14 +88,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             authorities);
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    customLogger.info("JWT Authentication successful for user: {}", user.getId());
+                    log.info("JWT Authentication successful for user: {}", user.getId());
 
                 } else {
-                    customLogger.warn(jwt);
+                    log.warn("JWT Authentication failed for token: {}", jwt);
                 }
             }
         } catch (Exception e) {
-            customLogger.error("JWT Authentication failed: {}", e.getMessage());
+            log.error("JWT Authentication failed: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
