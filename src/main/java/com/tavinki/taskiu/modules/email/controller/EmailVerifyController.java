@@ -57,7 +57,6 @@ public class EmailVerifyController {
             customLogger.info("Verification code sent to email: {}", toEmail);
             return ResponseEntity.ok(Map.of(MESSAGE, "sent successfully"));
         } catch (Exception e) {
-            e.printStackTrace();
             customLogger.error("Failed to send verification code to email: {}", toEmail, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(MESSAGE, "sending failed"));
         }

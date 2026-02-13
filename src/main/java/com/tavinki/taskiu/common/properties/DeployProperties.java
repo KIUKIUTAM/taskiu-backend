@@ -12,6 +12,4 @@ public class DeployProperties {
 
     private String expectedHost;
 
-    private String expectedApiHost;
-
 }
