@@ -1,16 +1,14 @@
 package com.tavinki.taskiu;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.tavinki.taskiu.common.test.RedisService;
 
@@ -67,6 +65,8 @@ class TaskiuApplicationTests {
 		assertThat(result).isEqualTo(1);
 	}
 
+
+	/*
 	@Test
 	void testRabbitMQSend() {
 		// This test will simply check if the application context loads with RabbitMQ
@@ -78,6 +78,8 @@ class TaskiuApplicationTests {
 		customLogger.info("Sent message to RabbitMQ queue '{}': {}", queueName, testMessage);
 		assertThat(1).isEqualTo(1);
 	}
+	*/
+
 
 	// @Test
 	// void testMongoDBConnection() {

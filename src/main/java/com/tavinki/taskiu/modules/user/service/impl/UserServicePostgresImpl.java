@@ -1,21 +1,20 @@
 package com.tavinki.taskiu.modules.user.service.impl;
 
+import java.util.Optional;
+
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.tavinki.taskiu.common.exception.EmailNotFoundException;
 import com.tavinki.taskiu.common.exception.UserAlreadyExistsException;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserJpaRepository;
 import com.tavinki.taskiu.modules.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
 @Service
-@Profile("postgres")
 @RequiredArgsConstructor
 public class UserServicePostgresImpl implements UserService {
 
