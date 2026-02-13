@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers(appSecurityConfig.getWhitelist().toArray(new String[0])).permitAll()
+                        .requestMatchers(appSecurityConfig.getWhitelist().toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(unauthorizedEntryPoint()))
