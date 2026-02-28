@@ -1,9 +1,17 @@
 package com.tavinki.taskiu.modules.user.entity;
 
-import jakarta.persistence.*; // 使用 Jakarta Persistence API
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -15,7 +23,8 @@ import java.time.Instant;
 
 import com.tavinki.taskiu.common.enums.RoleType;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -61,7 +70,8 @@ public class User {
     // --- 內部類保持為 POJO (Plain Old Java Object) 即可 ---
     // 建議加上 Serializable 接口
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -70,7 +80,8 @@ public class User {
         private GithubAuth github;
     }
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -79,7 +90,8 @@ public class User {
         private String email;
     }
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
