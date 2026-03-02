@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tavinki.taskiu.common.enums.LoginType;
-import com.tavinki.taskiu.common.exception.InvalidRefreshTokenException;
+import com.tavinki.taskiu.common.exceptions.InvalidRefreshTokenException;
 import com.tavinki.taskiu.common.properties.DeployProperties;
 import com.tavinki.taskiu.common.utils.HttpUtils;
 import com.tavinki.taskiu.modules.auth.dto.EmailLoginRequest;

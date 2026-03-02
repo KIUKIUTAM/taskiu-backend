@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.exception;
+package com.tavinki.taskiu.common.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

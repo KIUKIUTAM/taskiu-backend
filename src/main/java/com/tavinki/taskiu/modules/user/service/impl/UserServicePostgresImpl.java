@@ -6,8 +6,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.tavinki.taskiu.common.exception.EmailNotFoundException;
-import com.tavinki.taskiu.common.exception.UserAlreadyExistsException;
+import com.tavinki.taskiu.common.exceptions.EmailNotFoundException;
+import com.tavinki.taskiu.common.exceptions.UserAlreadyExistsException;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserJpaRepository;
 import com.tavinki.taskiu.modules.user.service.UserService;

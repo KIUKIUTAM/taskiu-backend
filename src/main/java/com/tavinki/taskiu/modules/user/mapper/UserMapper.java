@@ -1,7 +1,7 @@
 package com.tavinki.taskiu.modules.user.mapper;
 
 import com.tavinki.taskiu.common.enums.LoginType; // 假設你的 LoginType 在這裡
-import com.tavinki.taskiu.common.enums.RoleType;
+import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
@@ -19,7 +19,7 @@ public class UserMapper {
                                 .email(userInfo.getEmail())
                                 .name(userInfo.getName())
                                 .picture(userInfo.getPicture())
-                                .role(RoleType.USER);
+                                .role(SystemRole.USER);
 
                 // acording to LoginType build Auth entity
                 User.Auth.AuthBuilder authBuilder = User.Auth.builder();

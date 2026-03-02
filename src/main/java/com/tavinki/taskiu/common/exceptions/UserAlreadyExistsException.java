@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.exception;
+package com.tavinki.taskiu.common.exceptions;
 
 public class UserAlreadyExistsException extends RuntimeException {
     public UserAlreadyExistsException(String email) {

@@ -15,7 +15,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.tavinki.taskiu.modules.user.entity.User;
-import com.tavinki.taskiu.common.exception.EmailVerifyException;
+import com.tavinki.taskiu.common.exceptions.EmailVerifyException;
 import com.tavinki.taskiu.common.utils.CodeGeneratorUtils;
 import com.tavinki.taskiu.modules.email.repository.VerificationCodeRepository;
 import com.tavinki.taskiu.modules.user.service.UserService;

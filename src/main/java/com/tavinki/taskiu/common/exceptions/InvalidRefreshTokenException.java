@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.exception;
+package com.tavinki.taskiu.common.exceptions;
 
 public class InvalidRefreshTokenException extends RuntimeException {
     public InvalidRefreshTokenException(String message) {

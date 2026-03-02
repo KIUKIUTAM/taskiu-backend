@@ -17,9 +17,9 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tavinki.taskiu.common.enums.LoginType;
-import com.tavinki.taskiu.common.enums.RoleType;
-import com.tavinki.taskiu.common.exception.AuthException;
-import com.tavinki.taskiu.common.exception.EmailExistsAtRegistrationException;
+import com.tavinki.taskiu.common.enums.role.SystemRole;
+import com.tavinki.taskiu.common.exceptions.AuthException;
+import com.tavinki.taskiu.common.exceptions.EmailExistsAtRegistrationException;
 import com.tavinki.taskiu.common.properties.GoogleLoginProperties;
 import com.tavinki.taskiu.common.properties.GithubLoginProperties;
 import com.tavinki.taskiu.common.utils.JwtUtils;
@@ -195,7 +195,7 @@ public class AuthService {
                 .email(email)
                 .password(encodedPassword)
                 .name((email.split("@")[0]))
-                .role(RoleType.USER)
+                .role(SystemRole.USER)
                 .verified(false)
                 .banned(false)
                 .build();
