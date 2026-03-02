@@ -1,6 +1,6 @@
 package com.tavinki.taskiu.common.utils;
 
-import com.tavinki.taskiu.common.enums.RoleType;
+import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.common.properties.AppTokenProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -24,7 +24,7 @@ public class JwtUtils {
 
     private final AppTokenProperties appTokenProperties;
 
-    public String generateToken(String userId, String name, String email, String picture, RoleType role,
+    public String generateToken(String userId, String name, String email, String picture, SystemRole role,
             boolean isVerified, boolean isBanned) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
@@ -111,7 +111,7 @@ public class JwtUtils {
                 .name((String) claims.get("name"))
                 .email((String) claims.get("email"))
                 .picture((String) claims.get("picture"))
-                .role(RoleType.valueOf((String) claims.get("role")))
+                .role(SystemRole.valueOf((String) claims.get("role")))
                 .banned((Boolean) claims.get("banned"))
                 .verified((Boolean) claims.get("verified"))
                 .build());

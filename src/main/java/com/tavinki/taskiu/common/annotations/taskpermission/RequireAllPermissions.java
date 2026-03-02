@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.annotation;
+package com.tavinki.taskiu.common.annotations.taskpremission;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequireAnyPermission {
+public @interface RequireAllPermissions {
     String[] value();
 }
