@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.annotations.taskpremission;
+package com.tavinki.taskiu.common.annotations.taskpermission;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
