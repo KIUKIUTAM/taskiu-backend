@@ -3,6 +3,9 @@ package com.tavinki.taskiu.common.aspect;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,15 +14,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import com.tavinki.taskiu.common.annotation.HasPermission;
-import com.tavinki.taskiu.common.annotation.RequireAllPermissions;
-import com.tavinki.taskiu.common.annotation.RequireAnyPermission;
-import com.tavinki.taskiu.common.annotation.RequirePermission;
+
+import com.tavinki.taskiu.common.annotations.taskpermission.HasPermission;
+import com.tavinki.taskiu.common.annotations.taskpermission.RequireAllPermissions;
+import com.tavinki.taskiu.common.annotations.taskpermission.RequireAnyPermission;
+import com.tavinki.taskiu.common.annotations.taskpermission.RequirePermission;
 import com.tavinki.taskiu.common.enums.LogicalOperator;
+import com.tavinki.taskiu.common.exceptions.UnauthorizedException;
+
 import lombok.extern.slf4j.Slf4j;
-import java.util.Set;
-import java.util.stream.Collectors;
-import com.tavinki.taskiu.common.exception.UnauthorizedException;
 
 
 @Aspect
