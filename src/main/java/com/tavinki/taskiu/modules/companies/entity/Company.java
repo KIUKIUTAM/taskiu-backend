@@ -24,15 +24,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "companies")
-@SQLDelete(sql = "UPDATE companies SET is_archived = true WHERE id = ?")
-@SQLRestriction("is_archived = false")
+@SQLDelete(sql = "UPDATE companies SET archived = true WHERE id = ?")
+@SQLRestriction("archived = false")
 public class Company {
 
     @Id
@@ -58,7 +58,8 @@ public class Company {
     private Set<Team> teams;
 
     @Builder.Default
-    private boolean isArchived = false;
+    @Column(nullable = false)
+    private boolean archived = false;
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -5,6 +5,8 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.tavinki.taskiu.common.enums.role.CompanyRole;
 import com.tavinki.taskiu.modules.user.entity.User;
@@ -34,6 +36,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE company_members SET archived = true WHERE id = ?")
+@SQLRestriction("archived = false")
 @Table(
     name = "company_members",
     uniqueConstraints = {
@@ -68,6 +72,9 @@ public class CompanyMember {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CompanyRole role;
+
+    @Builder.Default
+    private boolean archived = false;
 
     @CreationTimestamp
     @Column(updatable = false)
