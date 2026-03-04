@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.tavinki.taskiu.modules.teams.entity.Team;
@@ -29,6 +31,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "companies")
+@SQLDelete(sql = "UPDATE companies SET is_archived = true WHERE id = ?")
+@SQLRestriction("is_archived = false")
 public class Company {
 
     @Id
@@ -38,16 +42,23 @@ public class Company {
     @Column(nullable = false, unique = true)
     private String companyId;
 
+    @Column(nullable = false, scale = 100)
     private String companyName;
 
+    @Column(scale = 200)
     private String companyAddress;
 
+    @Column(scale = 50)
     private String companyPicture;
 
+    @Column(scale = 500)
     private String companyDescription;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Team> teams;
+
+    @Builder.Default
+    private boolean isArchived = false;
 
     @CreationTimestamp
     @Column(updatable = false)
