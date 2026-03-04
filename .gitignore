@@ -86,4 +86,3 @@ src/main/resources/application.yaml
 .env.local
 .env.prod
 .env.*.local
-src/main/resources/application.yaml.bak
