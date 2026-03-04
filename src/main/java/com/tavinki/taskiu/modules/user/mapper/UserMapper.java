@@ -5,6 +5,9 @@ import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
+import com.tavinki.taskiu.modules.user.service.AvatarMinioService;
+
+
 
 public class UserMapper {
 
@@ -13,6 +16,8 @@ public class UserMapper {
         }
 
         public static User toEntity(OAuth2UserInfo userInfo, LoginType loginType) {
+
+                
                 // build base User entity
                 User.UserBuilder userBuilder = User.builder()
                                 .email(userInfo.getEmail())
@@ -67,7 +72,7 @@ public class UserMapper {
                                 }
                                 break;
                         case EMAIL:
-                                // 如果有其他登入方式，可以在這裡處理
+                                // Handle other login types here if necessary
                                 break;
                         default:
                                 throw new IllegalArgumentException("Unsupported login type: " + loginType);

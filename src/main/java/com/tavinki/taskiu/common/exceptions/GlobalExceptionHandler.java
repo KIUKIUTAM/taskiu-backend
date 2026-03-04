@@ -1,5 +1,10 @@
 package com.tavinki.taskiu.common.exceptions;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -9,11 +14,6 @@ import org.springframework.messaging.handler.annotation.support.MethodArgumentNo
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.UNAUTHORIZED,
                 ex.getMessage());
         ResponseCookie clearCookie = clearRefreshTokenCookie();
-        // 3. 回傳 401 Unauthorized 並帶上 Set-Cookie header
+        // 3. Return 401 Unauthorized with Set-Cookie header
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
                 .body(errorBody);
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
-    // 4. 攔截所有未知的錯誤 (兜底)
+    // 4. Intercept all unknown errors (Fallback)
     // Debug only: print stack trace
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleAllUncaughtException(Exception ex) {
@@ -87,9 +87,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
-        // 收集所有欄位的錯誤訊息
+        // Collect error messages for all fields
         ex.getBindingResult().getFieldErrors().forEach(error -> {
-            // 如果同一個欄位有多個錯誤，後面的會覆蓋前面的，或者你可以改成 List
+            // If a field has multiple errors, the later one overwrites the former, or you can change to List
             errors.put(error.getField(), error.getDefaultMessage());
         });
 

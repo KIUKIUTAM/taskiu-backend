@@ -26,7 +26,7 @@ public class UserServicePostgresImpl implements UserService {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        // 檢查 Email 是否已存在
+        // Check if Email already exists
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException(user.getEmail());
         }
@@ -43,7 +43,7 @@ public class UserServicePostgresImpl implements UserService {
     @Override
     @Transactional
     public void updateUserEmail(String oldEmail, String newEmail) {
-        // JPA 更新邏輯：先取出 -> 修改 -> 儲存(或由 Transaction 自動提交)
+        // JPA update logic: Retrieve -> Modify -> Save (or auto-commit by Transaction)
         User user = userRepository.findByEmail(oldEmail)
                 .orElseThrow(() -> new EmailNotFoundException("User with email " + oldEmail + " not found."));
 
@@ -54,25 +54,25 @@ public class UserServicePostgresImpl implements UserService {
     @Override
     @Transactional
     public void updateUser(@NonNull User user) {
-        // 注意：在 JPA 中，如果 user 是 detached 狀態，save 會執行 merge
+        // Note: In JPA, if user is in detached state, save will execute merge
         userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void deleteUserByEmail(String email) {
-        // 為了保持與 Mongo 版本邏輯一致：先查再刪
+        // To keep logic consistent with Mongo version: Find first then delete
         Optional<User> userOptional = userRepository.findByEmail(email);
         userOptional.ifPresent(userRepository::delete);
 
-        // 或者如果 Repository 有 deleteByEmail 方法，也可以直接呼叫：
+        // Or if Repository has deleteByEmail method, can call directly:
         // userRepository.deleteByEmail(email);
     }
 
     @Override
     @Transactional(readOnly = true)
     public User getUserById(@NonNull String userId) {
-        // 假設 ID 是 String 類型 (UUID 或 String ID)
+        // Assume ID is String type (UUID or String ID)
         return userRepository.findById(userId).orElse(null);
     }
 
@@ -84,7 +84,7 @@ public class UserServicePostgresImpl implements UserService {
 
         user.setVerified(true);
 
-        // save 方法會返回更新後的實體
+        // save method returns the updated entity
         return userRepository.save(user);
     }
 }

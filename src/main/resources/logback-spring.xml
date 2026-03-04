@@ -39,7 +39,7 @@
     </appender>
 
     <!-- ========================================== -->
-    <!-- Log 路由規則 -->
+    <!-- Log Routing Rules -->
     <!-- ========================================== -->
 
     <logger name="com.tavinki.taskiu.modules.auth" level="INFO" additivity="false">
@@ -51,12 +51,12 @@
     </logger>
 
     <!-- TRACE < DEBUG < INFO < WARN < ERROR  -->
-    <!-- 設定為 INFO，代表 INFO, WARN, ERROR 都會流進來 -->
+    <!-- Set to INFO, meaning INFO, WARN, ERROR will all be included -->
     <root level="INFO">
-        <!-- SYSTEM_FILE 會收到 INFO, WARN, ERROR -->
+        <!-- SYSTEM_FILE will receive INFO, WARN, ERROR -->
         <appender-ref ref="SYSTEM_FILE" />
         
-        <!-- ERROR_FILE 也會收到 INFO, WARN, ERROR，但因為它自己內部有 Filter，所以只會寫入 ERROR -->
+        <!-- ERROR_FILE will also receive INFO, WARN, ERROR, but it has an internal Filter, so only ERROR will be written -->
         <appender-ref ref="ERROR_FILE" />
     </root>
 

@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 用於標記不需要登入驗證 (JWT) 的公開接口
+ * Annotation to mark public endpoints that do not require login verification (JWT)
  */
-@Target({ ElementType.METHOD, ElementType.TYPE }) // 1. 允許用在「方法」和「類別」上
-@Retention(RetentionPolicy.RUNTIME) // 2. 重要！必須是 RUNTIME，攔截器才能透過反射讀取到
+@Target({ ElementType.METHOD, ElementType.TYPE }) // 1. Allowed on Methods and Classes
+@Retention(RetentionPolicy.RUNTIME) // 2. Important! Must be RUNTIME for interceptors to read via reflection
 public @interface PublicApi {
 }

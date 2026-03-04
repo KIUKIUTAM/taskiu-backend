@@ -1,61 +1,62 @@
 package com.tavinki.taskiu.modules.user.service;
 
-import com.tavinki.taskiu.modules.user.entity.User;
 import org.springframework.lang.NonNull;
+
+import com.tavinki.taskiu.modules.user.entity.User;
 
 public interface UserService {
 
     /**
-     * 創建新使用者
+     * Create new user
      * 
-     * @param user 使用者實體
-     * @return 創建後的使用者
+     * @param user User entity
+     * @return Created user
      */
     User createUser(User user);
 
     /**
-     * 透過 Email 獲取使用者
+     * Get user by Email
      * 
-     * @param email 信箱
-     * @return 使用者實體，若無則返回 null
+     * @param email Email address
+     * @return User entity, or null if not found
      */
     User getUserByEmail(String email);
 
     /**
-     * 更新使用者 Email
+     * Update user Email
      * 
-     * @param oldEmail 舊信箱
-     * @param newEmail 新信箱
+     * @param oldEmail Old email
+     * @param newEmail New email
      */
     void updateUserEmail(String oldEmail, String newEmail);
 
     /**
-     * 更新使用者資訊
+     * Update user information
      * 
-     * @param user 使用者實體
+     * @param user User entity
      */
     void updateUser(@NonNull User user);
 
     /**
-     * 透過 Email 刪除使用者
+     * Delete user by Email
      * 
-     * @param email 信箱
+     * @param email Email address
      */
     void deleteUserByEmail(String email);
 
     /**
-     * 透過 ID 獲取使用者
+     * Get user by ID
      * 
-     * @param userId 使用者 ID
-     * @return 使用者實體
+     * @param userId User ID
+     * @return User entity
      */
     User getUserById(@NonNull String userId);
 
     /**
-     * 標記 Email 為已驗證
+     * Mark Email as verified
      * 
-     * @param email 信箱
-     * @return 更新後的使用者實體
+     * @param email Email address
+     * @return Updated user entity
      */
     User markEmailAsVerified(@NonNull String email);
 }

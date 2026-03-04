@@ -49,7 +49,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Task {
 
-    // ==================== 1. 識別與基本資訊 ====================
+    // ==================== 1. Identification and Basic Info ====================
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -71,8 +71,7 @@ public class Task {
     @Column(nullable = false)
     private TaskType type;
 
-
-    // ==================== 2. 狀態與流程 ====================
+    // ==================== 2. Status and Workflow ====================
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -95,22 +94,15 @@ public class Task {
     @Column(nullable = false)
     private boolean archived = false;
 
-    // ==================== 3. 人員歸屬 ====================
+    // ==================== 3. Personnel Assignment ====================
 
-    // 負責人 (只存 User ID，不做 JOIN，避免過度耦合)
     @Column(name = "assignee_id")
     private String assigneeId;
 
-    // 建立者
     @Column(name = "creator_id", nullable = false, updatable = false)
     private String creatorId;
 
-    // 關注者 (獨立中介表)
-    @Builder.Default
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<TaskWatcher> watchers = new ArrayList<>();
-
-    // ==================== 4. 時間管理 ====================
+    // ==================== 4. Time Management ====================
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -126,16 +118,14 @@ public class Task {
     @Column
     private Instant startDate;
 
-    // 實際完成時間 (完成時才填入)
     @Column
     private Instant completedAt;
 
-    // ==================== 5. 分類與關聯 ====================
+    // ==================== 5. Classification and Relations ====================
 
     @Column(name = "project_id", nullable = false)
     private String projectId;
 
-    // 標籤 (存成獨立的 join table: task_tags)
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
         name = "task_tags",
@@ -145,16 +135,10 @@ public class Task {
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
 
-    // 父任務 (自我關聯，如果是子任務才有值)
     @Column(name = "parent_id")
     private String parentId;
 
-    // 子任務清單
-    @Builder.Default
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<TaskDependency> dependencies = new ArrayList<>();
-
-    // ==================== 6. 附件與留言 ====================
+    // ==================== 6. Attachments and Comments ====================
 
     @Builder.Default
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -165,27 +149,16 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TaskComment> comments = new ArrayList<>();
 
-    // ==================== 便利方法 (Helper Methods) ====================
+    // ==================== Helper Methods ====================
 
-    // 加入關注者
-    public void addWatcher(String userId) {
-        TaskWatcher watcher = new TaskWatcher(this, userId);
-        this.watchers.add(watcher);
-    }
-
-    // 移除關注者
-    public void removeWatcher(String userId) {
-        this.watchers.removeIf(w -> w.getUserId().equals(userId));
-    }
-
-    // 標記為完成
+    // Mark as completed
     public void markAsCompleted() {
         this.status = TaskStatus.DONE;
         this.progress = 100;
         this.completedAt = Instant.now();
     }
 
-    // 新增留言
+    // Add comment
     public void addComment(String userId, String content) {
         TaskComment comment = new TaskComment(this, userId, content);
         this.comments.add(comment);

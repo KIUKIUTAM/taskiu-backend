@@ -23,19 +23,19 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * JWT 認證過濾器 (JWT Authentication Filter)
+ * JWT Authentication Filter
  *
  * <p>
- * 此過濾器會攔截每一個 HTTP 請求，檢查 Authorization Header。
- * 流程如下：
+ * This filter intercepts every HTTP request and checks the Authorization Header.
+ * The process is as follows:
  * <ol>
- * <li>檢查 Header 是否包含 "Bearer " 開頭的 Token。</li>
- * <li>解析 Token 並驗證有效性。</li>
- * <li>若驗證成功，將 {@link UserResponseDto} 封裝並存入 {@link SecurityContextHolder}。</li>
+ * <li>Check if the Header contains a Token starting with "Bearer ".</li>
+ * <li>Parse the Token and verify its validity.</li>
+ * <li>If verification is successful, encapsulate {@link UserResponseDto} and store it in {@link SecurityContextHolder}.</li>
  * </ol>
  *
- * <h3>如何獲取當前登入使用者 (Usage):</h3>
- * 在 Controller 中，請使用 {@code @AuthenticationPrincipal} 註解直接取得使用者物件：
+ * <h3>How to get the current logged-in user (Usage):</h3>
+ * In the Controller, use the {@code @AuthenticationPrincipal} annotation to directly get the user object:
  *
  * <pre>
  * &#64;GetMapping("/me")

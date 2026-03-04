@@ -29,8 +29,8 @@ public class HttpUtils {
             if (value == null || value.isEmpty() || "unknown".equalsIgnoreCase(value)) {
                 continue;
             }
-            // X-Forwarded-For 可能包含多個 IP，格式為 "client, proxy1, proxy2"
-            // 我們只需要第一個，也就是真實客戶端 IP
+            // X-Forwarded-For may contain multiple IPs, format "client, proxy1, proxy2"
+            // We only need the first one, which is the real client IP
             String[] parts = value.split("\\s*,\\s*");
             return parts[0];
         }

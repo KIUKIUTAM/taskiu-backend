@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@RequirePermission(value = {})  // 會被 Aspect 特殊處理
+@RequirePermission(value = {})  // Will be specially handled by Aspect
 public @interface HasPermission {
     String value();
 }

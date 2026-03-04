@@ -12,7 +12,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 獲取當前登入使用者的 Helper Function
+     * Helper Function to get current logged-in user
      */
     public static Optional<UserResponseDto> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -23,7 +23,7 @@ public class SecurityUtils {
 
         Object principal = authentication.getPrincipal();
 
-        // 確保 principal 是我們預期的 UserResponseDto 類型
+        // Ensure principal is of expected UserResponseDto type
         if (principal instanceof UserResponseDto) {
             return Optional.of((UserResponseDto) principal);
         }

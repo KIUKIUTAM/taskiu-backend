@@ -13,15 +13,15 @@ public class RegisterRequest {
     @Email(message = "Email structure is invalid")
     private String email;
 
-    // 1. 長度檢查
+    // 1. Length check
     @Size(min = 6, max = 20, message = "Password length must be between 6 and 20 characters")
-    // 2. 小寫檢查 (注意前後的 .*)
+    // 2. Lowercase check (note the surrounding .*)
     @Pattern(regexp = ".*[a-z].*", message = "Password must contain at least one lowercase letter")
 
-    // 3. 大寫檢查
+    // 3. Uppercase check
     @Pattern(regexp = ".*[A-Z].*", message = "Password must contain at least one uppercase letter")
 
-    // 4. 數字檢查 (Java 字串中 \ 需轉義為 \\)
+    // 4. Digit check (escape \ as \\ in Java strings)
     @Pattern(regexp = ".*\\d.*", message = "Password must contain at least one digit")
     private String password;
 

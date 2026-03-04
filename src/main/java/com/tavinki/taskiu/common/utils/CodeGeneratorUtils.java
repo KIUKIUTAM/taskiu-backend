@@ -8,7 +8,7 @@ public class CodeGeneratorUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    // SecureRandom 建立成本較高，建議宣告為 static 重複使用
+    // SecureRandom creation is expensive, recommended to declare as static for reuse
     private static final SecureRandom secureRandom = new SecureRandom();
 
     public static String generateSecureCode() {

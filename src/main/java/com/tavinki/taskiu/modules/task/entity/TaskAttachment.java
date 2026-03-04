@@ -42,11 +42,9 @@ public class TaskAttachment {
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
-    // 上傳者
     @Column(name = "uploader_id", nullable = false)
     private String uploaderId;
 
-    
     @Column(nullable = false)
     private String fileName;
 
@@ -56,7 +54,6 @@ public class TaskAttachment {
     @Column
     private String mimeType;
 
-    // 檔案大小 (bytes)
     @Column
     private Long fileSize;
 

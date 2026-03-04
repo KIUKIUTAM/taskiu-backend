@@ -16,7 +16,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "refresh_tokens") // 獨立的 Collection
+@Document(collection = "refresh_tokens") // Independent Collection
 public class RefreshToken {
 
     @Id

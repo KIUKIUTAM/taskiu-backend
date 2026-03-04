@@ -68,8 +68,8 @@ public class User {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    // --- 內部類保持為 POJO (Plain Old Java Object) 即可 ---
-    // 建議加上 Serializable 接口
+    // --- Inner classes should remain as POJOs ---
+    // It is recommended to implement Serializable interface
 
     @Getter
     @Setter

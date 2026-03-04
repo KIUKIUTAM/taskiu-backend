@@ -41,7 +41,7 @@ public class PermissionAspect {
         String[] requiredPermissions;
         LogicalOperator operator;
         
-        // 優先處理 HasPermission，因為它是 RequirePermission 的特殊簡化版本
+        // Prioritize HasPermission, as it is a simplified version of RequirePermission
         if (method.isAnnotationPresent(HasPermission.class)) {
             HasPermission annotation = method.getAnnotation(HasPermission.class);
             requiredPermissions = new String[]{annotation.value()};

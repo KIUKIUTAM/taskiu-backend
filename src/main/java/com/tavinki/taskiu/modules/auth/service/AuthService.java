@@ -24,11 +24,14 @@ import com.tavinki.taskiu.common.properties.GoogleLoginProperties;
 import com.tavinki.taskiu.common.properties.GithubLoginProperties;
 import com.tavinki.taskiu.common.utils.JwtUtils;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.OAuthLoginResult;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.mapper.UserMapper;
 import com.tavinki.taskiu.modules.user.service.UserService;
+import com.tavinki.taskiu.modules.user.service.AvatarMinioService;
+import com.tavinki.taskiu.modules.user.dto.AvatarUploadResult;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,8 @@ public class AuthService {
     private final RestClient.Builder restClientBuilder;
 
     private final UserService userService;
+
+    private final AvatarMinioService avatarMinioService;
 
     private final JwtUtils jwtUtils;
 
@@ -139,7 +144,7 @@ public class AuthService {
                         || userInfo.getEmail().endsWith("noreply.github.com");
 
                 if (needFetchEmail) {
-                    // 呼叫 /user/emails
+                    // Call /user/emails
                     List<Map<String, Object>> emails = restClient.get()
                             .uri("https://api.github.com/user/emails")
                             .header("Authorization", "Bearer " + accessToken)
@@ -203,29 +208,41 @@ public class AuthService {
         return userService.createUser(newUser);
     }
 
-    public User getOrCreateUserForOAuth(OAuth2UserInfo userInfo, LoginType loginType) {
+    public OAuthLoginResult getOrCreateUserForOAuth(OAuth2UserInfo userInfo, LoginType loginType) {
 
-        User user = userService.getUserByEmail(userInfo.getEmail());
+    User user = userService.getUserByEmail(userInfo.getEmail());
+    String avatarUploadError = null;
 
-        if (user != null) {
-            log.info("Existing user logged in: {}", user.getEmail());
+    if (user != null) {
+        log.info("Existing user logged in: {}", user.getEmail());
+        UserMapper.updateAuthInfo(user, userInfo, loginType);
+        userService.updateUser(user);
 
-            UserMapper.updateAuthInfo(user, userInfo, loginType);
+    } else {
+        log.info("New user registration via {}: {}", loginType, userInfo.getEmail());
 
-            userService.updateUser(user);
+        // download avatar from OAuth picture URL and upload to MinIO
+        AvatarUploadResult avatarResult = avatarMinioService.uploadFromUrl(userInfo.getEmail(), userInfo.getPicture());
 
+        if (avatarResult.isSuccess()) {
+            userInfo.setPicture(avatarResult.getKey());
         } else {
-            log.info("New user registration via {}: {}", loginType, userInfo.getEmail());
-
-            user = UserMapper.toEntity(userInfo, loginType);
-            // Only OAuth2 users are considered verified
-            user.setVerified(true);
-            user.setBanned(false);
-            user = userService.createUser(user);
+            avatarUploadError = avatarResult.getErrorMessage();
+            userInfo.setPicture(null);
         }
 
-        return user;
+        user = UserMapper.toEntity(userInfo, loginType);
+        user.setVerified(true);
+        user.setBanned(false);
+        user = userService.createUser(user);
     }
+
+    return OAuthLoginResult.builder()
+            .user(user)
+            .avatarUploadError(avatarUploadError)
+            .build();
+}
+
 
     public String generateJwtToken(User user) {
         return jwtUtils.generateToken(user.getId(), user.getName(), user.getEmail(), user.getPicture(), user.getRole(),
