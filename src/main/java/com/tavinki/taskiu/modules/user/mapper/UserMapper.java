@@ -1,6 +1,6 @@
 package com.tavinki.taskiu.modules.user.mapper;
 
-import com.tavinki.taskiu.common.enums.LoginType; // 假設你的 LoginType 在這裡
+import com.tavinki.taskiu.common.enums.LoginType;
 import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
@@ -12,7 +12,6 @@ public class UserMapper {
                 throw new UnsupportedOperationException("Utility class cannot be instantiated");
         }
 
-        // 通用的轉 Entity 方法
         public static User toEntity(OAuth2UserInfo userInfo, LoginType loginType) {
                 // build base User entity
                 User.UserBuilder userBuilder = User.builder()
