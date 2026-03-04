@@ -1,5 +1,7 @@
 package com.tavinki.taskiu.common.properties;
 
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,4 +15,5 @@ public class MinioProperties {
     private String accessKey;
     private String secretKey;
     private String bucketName;
+    private Map<String, String> prefix;
 }

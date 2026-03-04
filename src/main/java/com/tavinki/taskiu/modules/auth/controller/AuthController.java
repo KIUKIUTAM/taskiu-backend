@@ -2,9 +2,9 @@ package com.tavinki.taskiu.modules.auth.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -23,6 +23,7 @@ import com.tavinki.taskiu.modules.auth.dto.EmailLoginRequest;
 import com.tavinki.taskiu.modules.auth.dto.GitHubUser;
 import com.tavinki.taskiu.modules.auth.dto.GoogleOrGithubLoginRequest;
 import com.tavinki.taskiu.modules.auth.dto.GoogleUser;
+import com.tavinki.taskiu.modules.auth.dto.OAuthLoginResult;
 import com.tavinki.taskiu.modules.auth.dto.RegisterRequest;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.auth.service.RefreshTokenService;
@@ -35,9 +36,8 @@ import com.tavinki.taskiu.modules.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/auth")
@@ -73,19 +73,24 @@ public class AuthController {
                 String userAgent = HttpUtils.getUserAgent(request);
                 GoogleUser userInfo = authService.googleAuthorizationCodeExchange(googleRequest.getCode(),
                                 googleRequest.getCodeVerifier());
-                User user = authService.getOrCreateUserForOAuth(userInfo, LoginType.GOOGLE);
-                String accessToken = authService.generateJwtToken(user);
-                String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                log.info("Google login successful for user: {}, IP: {}", user.getEmail(),
+                OAuthLoginResult loginResult = authService.getOrCreateUserForOAuth(userInfo, LoginType.GOOGLE);
+                String accessToken = authService.generateJwtToken(loginResult.getUser());
+                String refreshToken = refreshTokenService.generateRefreshToken(loginResult.getUser().getId(), ipAddress,
+                                userAgent);
+                log.info("Google login successful for user: {}, IP: {}", loginResult.getUser().getEmail(),
                                 ipAddress);
+                Map<String, Object> responseBody = new HashMap<>();
+                responseBody.put(MESSAGE, LOGIN_SUCCESS);
+                responseBody.put(ACCESS_TOKEN, accessToken);
+                responseBody.put(LOGIN_TYPE, LoginType.GOOGLE);
+                if (loginResult.hasAvatarError()) {
+                        responseBody.put("avatarUploadError", loginResult.getAvatarUploadError());
+                }
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
                                                 refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
                                                                 .toString())
-                                .body(Map.of(
-                                                MESSAGE, LOGIN_SUCCESS,
-                                                ACCESS_TOKEN, accessToken,
-                                                LOGIN_TYPE, LoginType.GOOGLE));
+                                .body(responseBody);
         }
 
         @PostMapping("/github")
@@ -98,19 +103,27 @@ public class AuthController {
                 GitHubUser userInfo = authService.githubAuthorizationCodeExchange(githubRequest.getCode(),
                                 githubRequest.getCodeVerifier());
 
-                User user = authService.getOrCreateUserForOAuth(userInfo, LoginType.GITHUB);
-                String accessToken = authService.generateJwtToken(user);
-                String refreshToken = refreshTokenService.generateRefreshToken(user.getId(), ipAddress, userAgent);
-                log.info("GitHub login successful for user: {}, IP: {}", user.getEmail(),
+                OAuthLoginResult loginResult = authService.getOrCreateUserForOAuth(userInfo, LoginType.GITHUB);
+                String accessToken = authService.generateJwtToken(loginResult.getUser());
+                String refreshToken = refreshTokenService.generateRefreshToken(loginResult.getUser().getId(), ipAddress,
+                                userAgent);
+                log.info("GitHub login successful for user: {}, IP: {}", loginResult.getUser().getEmail(),
                                 ipAddress);
+                Map<String, Object> responseBody = new HashMap<>();
+                responseBody.put(MESSAGE, LOGIN_SUCCESS);
+                responseBody.put(ACCESS_TOKEN, accessToken);
+                responseBody.put(LOGIN_TYPE, LoginType.GITHUB);
+
+                // toast the avatar upload error if it exists, but don't fail the login flow
+                if (loginResult.hasAvatarError()) {
+                        responseBody.put("avatarUploadError", loginResult.getAvatarUploadError());
+                }
+
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE,
                                                 refreshTokenService.generateRefreshTokenCookieForm(refreshToken)
                                                                 .toString())
-                                .body(Map.of(
-                                                MESSAGE, LOGIN_SUCCESS,
-                                                ACCESS_TOKEN, accessToken,
-                                                LOGIN_TYPE, LoginType.GITHUB));
+                                .body(responseBody);
         }
 
         @PostMapping("login")
@@ -231,13 +244,13 @@ public class AuthController {
 
         private String getDomainFromUrl(String url) {
                 try {
-                        // 如果 url 不包含 http/https，URI 解析可能會出錯，這裡做個簡單判斷
+                        // If url does not contain http/https, URI parsing might fail, simple check here
                         if (!url.startsWith("http")) {
                                 return url;
                         }
-                        return new URI(url).getHost(); // 會把 https://tavinki.com 變成 tavinki.com
+                        return new URI(url).getHost(); // Will turn https://tavinki.com into tavinki.com
                 } catch (URISyntaxException e) {
-                        // 錯誤處理或是直接回傳原字串
+                        // Error handling or return original string
                         return url;
                 }
         }

@@ -9,4 +9,6 @@ public interface OAuth2UserInfo {
 
     String getPicture();
 
+    void setPicture(String picture);
+
 }
