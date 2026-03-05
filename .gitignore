@@ -72,14 +72,11 @@ spring-boot-devtools.log
 secrets/
 credentials/
 
-application.yml
-application.yaml
-application.properties
+
 application-*.yml
 application-*.yaml
 application-*.properties
 
-src/main/resources/application.yaml
 
 
 .env
