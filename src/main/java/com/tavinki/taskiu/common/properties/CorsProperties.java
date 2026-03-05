@@ -14,4 +14,5 @@ public class CorsProperties {
     private List<String> allowedOrigins;
     private boolean allowCredentials;
     private List<String> allowedMethods;
+    private List<String> allowedHeaders;
 }
