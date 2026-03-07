@@ -5,10 +5,10 @@ import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
-import com.tavinki.taskiu.modules.user.service.AvatarMinioService;
+import lombok.extern.slf4j.Slf4j;
 
 
-
+@Slf4j
 public class UserMapper {
 
         private UserMapper() {
@@ -17,7 +17,6 @@ public class UserMapper {
 
         public static User toEntity(OAuth2UserInfo userInfo, LoginType loginType) {
 
-                
                 // build base User entity
                 User.UserBuilder userBuilder = User.builder()
                                 .email(userInfo.getEmail())
@@ -29,19 +28,17 @@ public class UserMapper {
                 User.Auth.AuthBuilder authBuilder = User.Auth.builder();
 
                 switch (loginType) {
-                        case GOOGLE:
+                        case GOOGLE ->
                                 authBuilder.google(User.GoogleAuth.builder()
                                                 .id(userInfo.getSub())
                                                 .email(userInfo.getEmail())
                                                 .build());
-                                break;
-                        case GITHUB:
+                        case GITHUB ->
                                 authBuilder.github(User.GithubAuth.builder()
                                                 .id(userInfo.getSub())
                                                 .email(userInfo.getEmail())
                                                 .build());
-                                break;
-                        default:
+                        default ->
                                 throw new IllegalArgumentException("Unsupported login type: " + loginType);
                 }
 
@@ -55,26 +52,29 @@ public class UserMapper {
                 }
 
                 switch (loginType) {
-                        case GOOGLE:
+                        case GOOGLE -> {
                                 if (user.getAuth().getGoogle() == null) {
                                         user.getAuth().setGoogle(User.GoogleAuth.builder()
                                                         .id(userInfo.getSub())
                                                         .email(userInfo.getEmail())
                                                         .build());
+                                }else{
+                                        log.info("User {} already has Google auth info, skipping update", user.getEmail());
                                 }
-                                break;
-                        case GITHUB:
+                        }
+
+                        case GITHUB -> {
                                 if (user.getAuth().getGithub() == null) {
                                         user.getAuth().setGithub(User.GithubAuth.builder()
                                                         .id(userInfo.getSub())
                                                         .email(userInfo.getEmail())
                                                         .build());
+                                }else{
+                                        log.info("User {} already has Github auth info, skipping update", user.getEmail());
                                 }
-                                break;
-                        case EMAIL:
-                                // Handle other login types here if necessary
-                                break;
-                        default:
+                        }
+
+                        default ->
                                 throw new IllegalArgumentException("Unsupported login type: " + loginType);
                 }
         }
