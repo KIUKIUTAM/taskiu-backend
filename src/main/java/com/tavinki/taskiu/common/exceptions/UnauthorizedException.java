@@ -10,4 +10,10 @@ public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String message, Throwable cause) {
         super(message, cause);
     }
+
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this; 
+    }
 }

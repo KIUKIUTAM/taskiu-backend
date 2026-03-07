@@ -9,4 +9,9 @@ public class AuthException extends RuntimeException {
     public AuthException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this; 
+    }
 }

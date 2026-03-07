@@ -1,6 +1,6 @@
 package com.tavinki.taskiu.common.exceptions;
 
-public class AccessDeniedException extends RuntimeException {
+public class AccessDeniedException extends AuthException {
         public AccessDeniedException(String message) {
         super(message);
     }

@@ -8,4 +8,9 @@ public class InvalidAccessTokenException extends RuntimeException {
     public InvalidAccessTokenException(String message) {
         super(message);
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this; 
+    }
 }

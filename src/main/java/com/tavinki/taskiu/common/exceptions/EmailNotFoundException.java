@@ -10,4 +10,8 @@ public class EmailNotFoundException extends RuntimeException {
         super(message, cause);
     }
 
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this; 
+    }
 }
