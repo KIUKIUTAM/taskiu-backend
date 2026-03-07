@@ -2,16 +2,16 @@ package com.tavinki.taskiu.modules.user.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.tavinki.taskiu.common.exceptions.minio.MinioUploadException;
 import com.tavinki.taskiu.common.minio.BaseMinioService;
 import com.tavinki.taskiu.common.properties.MinioProperties;
 import com.tavinki.taskiu.modules.user.dto.AvatarUploadResult;
 
 import io.minio.MinioClient;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
