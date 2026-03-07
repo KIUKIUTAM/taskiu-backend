@@ -6,7 +6,7 @@ public class EmailExistsAtRegistrationException extends RuntimeException {
         super("Email already exists: " + email);
     }
 
-        @Override
+    @Override
     public synchronized Throwable fillInStackTrace() {
         return this; 
     }
