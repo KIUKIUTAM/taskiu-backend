@@ -3,9 +3,10 @@ package com.tavinki.taskiu.modules.teams.entity;
 import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.tavinki.taskiu.common.enums.role.TeamRole;
 import com.tavinki.taskiu.modules.user.entity.User;
 
@@ -71,7 +72,6 @@ public class TeamMember {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TeamRole role;
-
 
     @Builder.Default
     private boolean archived = false;
