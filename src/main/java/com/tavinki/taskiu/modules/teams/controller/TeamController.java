@@ -18,9 +18,12 @@ import com.tavinki.taskiu.common.annotations.role.RequireTeamRole;
 import com.tavinki.taskiu.common.enums.role.TeamRole;
 import com.tavinki.taskiu.modules.teams.dto.CreateTeamRequest;
 import com.tavinki.taskiu.modules.teams.dto.InviteMemberRequest;
+import com.tavinki.taskiu.modules.teams.dto.TeamMemberResponseDto;
+import com.tavinki.taskiu.modules.teams.dto.TeamResponseDto;
 import com.tavinki.taskiu.modules.teams.dto.UpdateTeamRequest;
 import com.tavinki.taskiu.modules.teams.entity.Team;
 import com.tavinki.taskiu.modules.teams.entity.TeamMember;
+import com.tavinki.taskiu.modules.teams.mapper.TeamMapper;
 import com.tavinki.taskiu.modules.teams.service.TeamService;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
@@ -30,7 +33,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/teams")
+@RequestMapping("/teams")
 @RequiredArgsConstructor
 public class TeamController {
 
@@ -38,24 +41,25 @@ public class TeamController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<Team> createTeam(
+    public ResponseEntity<TeamResponseDto> createTeam(
             @Valid @RequestBody CreateTeamRequest request,
             @AuthenticationPrincipal UserResponseDto currentUser) {
         User user = userService.getUserById(currentUser.getId());
         Team team = teamService.createTeam(request.getName(), request.getDescription(), user);
-        return ResponseEntity.ok(team);
+        return ResponseEntity.ok(TeamMapper.toTeamDto(team));
     }
 
     @GetMapping("/{teamId}")
     @RequireTeamRole({TeamRole.OWNER, TeamRole.ADMIN, TeamRole.MEMBER})
-    public ResponseEntity<Team> getTeam(@PathVariable @TeamId String teamId) {
+    public ResponseEntity<TeamResponseDto> getTeam(
+            @PathVariable @TeamId String teamId) {
         Team team = teamService.getTeamByPublicId(teamId);
-        return ResponseEntity.ok(team);
+        return ResponseEntity.ok(TeamMapper.toTeamDto(team));
     }
 
     @PutMapping("/{teamId}")
     @RequireTeamRole({TeamRole.OWNER, TeamRole.ADMIN})
-    public ResponseEntity<Team> updateTeam(
+    public ResponseEntity<TeamResponseDto> updateTeam(
             @PathVariable @TeamId String teamId,
             @Valid @RequestBody UpdateTeamRequest request) {
         Team updatedTeam = teamService.updateTeam(
@@ -63,30 +67,35 @@ public class TeamController {
                 request.getName(),
                 request.getDescription(),
                 request.getPicture());
-        return ResponseEntity.ok(updatedTeam);
+        return ResponseEntity.ok(TeamMapper.toTeamDto(updatedTeam));
     }
 
     @DeleteMapping("/{teamId}")
     @RequireTeamRole(TeamRole.OWNER)
-    public ResponseEntity<Void> deleteTeam(@PathVariable @TeamId String teamId) {
+    public ResponseEntity<Void> deleteTeam(
+            @PathVariable @TeamId String teamId) {
         teamService.deleteTeam(teamId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{teamId}/members")
     @RequireTeamRole({TeamRole.OWNER, TeamRole.ADMIN, TeamRole.MEMBER})
-    public ResponseEntity<List<TeamMember>> getTeamMembers(@PathVariable @TeamId String teamId) {
+    public ResponseEntity<List<TeamMemberResponseDto>> getTeamMembers(
+            @PathVariable @TeamId String teamId) {
         List<TeamMember> members = teamService.getTeamMembers(teamId);
-        return ResponseEntity.ok(members);
+        List<TeamMemberResponseDto> response = members.stream()
+                .map(TeamMapper::toTeamMemberDto)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{teamId}/members")
     @RequireTeamRole({TeamRole.OWNER, TeamRole.ADMIN})
-    public ResponseEntity<TeamMember> addMember(
+    public ResponseEntity<TeamMemberResponseDto> addMember(
             @PathVariable @TeamId String teamId,
             @Valid @RequestBody InviteMemberRequest request) {
         TeamMember member = teamService.addMember(teamId, request.getEmail(), request.getRole());
-        return ResponseEntity.ok(member);
+        return ResponseEntity.ok(TeamMapper.toTeamMemberDto(member));
     }
 
     @DeleteMapping("/{teamId}/members/{userId}")
@@ -99,9 +108,12 @@ public class TeamController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<TeamMember>> getMyTeams(@AuthenticationPrincipal UserResponseDto currentUser) {
+    public ResponseEntity<List<TeamMemberResponseDto>> getMyTeams(
+            @AuthenticationPrincipal UserResponseDto currentUser) {
         List<TeamMember> userTeams = teamService.getUserTeams(currentUser.getId());
-        return ResponseEntity.ok(userTeams);
+        List<TeamMemberResponseDto> response = userTeams.stream()
+                .map(TeamMapper::toTeamMemberDto)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }
-

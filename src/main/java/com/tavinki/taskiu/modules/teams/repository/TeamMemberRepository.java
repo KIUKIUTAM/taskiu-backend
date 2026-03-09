@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.tavinki.taskiu.common.enums.role.TeamRole;
@@ -14,41 +16,44 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, String> 
 
     /**
      * Find all members of a specific team (by Team DB UUID).
+     * JOIN FETCH to avoid LazyInitializationException.
      */
-    List<TeamMember> findByTeamId(String teamId);
+    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team JOIN FETCH tm.user WHERE tm.team.id = :teamId")
+    List<TeamMember> findByTeamId(@Param("teamId") String teamId);
 
     /**
      * Find all teams a specific user is part of (by User DB UUID).
+     * JOIN FETCH to avoid LazyInitializationException.
      */
-    List<TeamMember> findByUserId(String userId);
+    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team JOIN FETCH tm.user WHERE tm.user.id = :userId")
+    List<TeamMember> findByUserId(@Param("userId") String userId);
 
     /**
      * Find a specific membership record by Team ID and User ID.
-     * Useful for checking role or updating membership.
+     * JOIN FETCH to avoid LazyInitializationException.
      */
-    Optional<TeamMember> findByTeamIdAndUserId(String teamId, String userId);
+    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team JOIN FETCH tm.user WHERE tm.team.id = :teamId AND tm.user.id = :userId")
+    Optional<TeamMember> findByTeamIdAndUserId(@Param("teamId") String teamId, @Param("userId") String userId);
 
     /**
      * Check if a user is already a member of a team.
-     * Useful for validation before adding a new member.
      */
     boolean existsByTeamIdAndUserId(String teamId, String userId);
 
     /**
      * Delete a specific membership record by Team ID and User ID.
-     * Used when removing a member from a team.
      */
     void deleteByTeamIdAndUserId(String teamId, String userId);
 
     /**
      * Find all members of a team with a specific role.
-     * Example: find all ADMIN members of a team.
+     * JOIN FETCH to avoid LazyInitializationException.
      */
-    List<TeamMember> findByTeamIdAndRole(String teamId, TeamRole role);
+    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team JOIN FETCH tm.user WHERE tm.team.id = :teamId AND tm.role = :role")
+    List<TeamMember> findByTeamIdAndRole(@Param("teamId") String teamId, @Param("role") TeamRole role);
 
     /**
      * Count the number of members in a team.
-     * Useful for displaying team size or enforcing member limits.
      */
     long countByTeamId(String teamId);
 }
