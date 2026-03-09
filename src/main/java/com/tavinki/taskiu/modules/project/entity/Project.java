@@ -2,17 +2,14 @@ package com.tavinki.taskiu.modules.project.entity;
 
 
 import java.time.Instant;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.tavinki.taskiu.modules.task.entity.Task;
 import com.tavinki.taskiu.modules.teams.entity.Team;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,7 +19,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,9 +57,6 @@ public class Project {
         foreignKey = @ForeignKey(name = "fk_projects_team")
     )
     private Team team;
-
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks;
 
     @Builder.Default
     private boolean archived = false;
