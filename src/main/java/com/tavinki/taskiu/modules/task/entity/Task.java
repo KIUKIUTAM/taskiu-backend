@@ -1,10 +1,6 @@
 package com.tavinki.taskiu.modules.task.entity;
 
 import java.time.Instant;
-<<<<<<< HEAD
-=======
-import java.time.LocalDate;
->>>>>>> master
 import java.util.ArrayList;
 import java.util.List;
 
