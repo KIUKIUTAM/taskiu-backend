@@ -55,7 +55,6 @@ public abstract class BaseMinioService {
                             .build());
         } catch (Exception e) {
             log.error("Failed to generate presigned URL for key: {}", key, e);
-            // ✅ 使用 MinioException，訊息由 exception 本身管理
             throw new MinioException("Failed to generate presigned URL for key: " + key, e);
         }
     }
@@ -79,7 +78,6 @@ public abstract class BaseMinioService {
             return key;
         } catch (Exception e) {
             log.error("Failed to upload file: {}", filename, e);
-            // ✅ 訊息由 MinioUploadException 統一管理
             throw new MinioUploadException(filename, e);
         }
     }
@@ -102,7 +100,6 @@ public abstract class BaseMinioService {
             return key;
         } catch (Exception e) {
             log.error("Failed to upload file with key: {}", key, e);
-            // ✅ 同樣使用 MinioUploadException
             throw new MinioUploadException(key, e);
         }
     }
@@ -130,7 +127,6 @@ public abstract class BaseMinioService {
             throw new MinioDownloadException(key, e);
         } catch (Exception e) {
             log.error("Failed to download file: {}", key, e);
-            // ✅ 使用 MinioDownloadException
             throw new MinioDownloadException(key, e);
         }
     }
@@ -150,7 +146,6 @@ public abstract class BaseMinioService {
             log.info("Deleted file: {}", key);
         } catch (Exception e) {
             log.error("Failed to delete file: {}", key, e);
-            // ✅ 使用 MinioDeleteException
             throw new MinioDeleteException(key, e);
         }
     }
