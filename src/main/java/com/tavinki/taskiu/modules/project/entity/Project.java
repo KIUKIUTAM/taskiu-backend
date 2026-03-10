@@ -50,6 +50,9 @@ public class Project {
 
     private String projectPicture;
 
+    @jakarta.persistence.Transient
+    private String projectPictureUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "team_id",
