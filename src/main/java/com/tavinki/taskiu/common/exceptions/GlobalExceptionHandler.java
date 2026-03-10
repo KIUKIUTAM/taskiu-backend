@@ -3,7 +3,6 @@ package com.tavinki.taskiu.common.exceptions;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
