@@ -1,11 +1,18 @@
 package com.tavinki.taskiu;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -15,11 +22,6 @@ import com.tavinki.taskiu.modules.user.dto.AvatarUploadResult;
 import com.tavinki.taskiu.modules.user.service.AvatarMinioService;
 
 import io.minio.MinioClient;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AvatarMinioServiceTest {
@@ -177,7 +179,7 @@ class AvatarMinioServiceTest {
             doReturn(fakeImageBytes).when(responseSpec).body(byte[].class);
 
             doThrow(new RuntimeException("MinIO connection refused"))
-                    .when(avatarMinioService).upload(anyString(), any(), anyString());
+                    .when(avatarMinioService).upload(anyString(), any(),anyInt(), anyString());
 
             // Act
             AvatarUploadResult result = avatarMinioService.uploadFromUrl(userId, imageUrl);
