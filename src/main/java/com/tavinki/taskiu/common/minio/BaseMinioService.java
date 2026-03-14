@@ -64,14 +64,14 @@ public abstract class BaseMinioService {
      *
      * @return the generated object key
      */
-    public String upload(String filename, InputStream inputStream, String contentType) {
+    public String upload(String filename, InputStream inputStream, long objectSize, String contentType) {
         try {
             String key = buildKey(filename);
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(minioProperties.getBucketName())
                             .object(key)
-                            .stream(inputStream, inputStream.available(), -1)
+                            .stream(inputStream, objectSize, -1)
                             .contentType(contentType)
                             .build());
             log.info("Uploaded file: {}", key);
@@ -87,13 +87,13 @@ public abstract class BaseMinioService {
      *
      * @return the provided object key
      */
-    public String uploadWithKey(String key, InputStream inputStream, String contentType) {
+    public String uploadWithKey(String key, InputStream inputStream, long objectSize, String contentType) {
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(minioProperties.getBucketName())
                             .object(key)
-                            .stream(inputStream, inputStream.available(), -1)
+                            .stream(inputStream, objectSize, -1)
                             .contentType(contentType)
                             .build());
             log.info("Uploaded file with key: {}", key);

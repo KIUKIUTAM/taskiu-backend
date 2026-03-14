@@ -69,7 +69,7 @@ class AvatarMinioServiceTest {
             doReturn(responseSpec).when(requestHeadersSpec).retrieve();
             doReturn(fakeImageBytes).when(responseSpec).body(byte[].class);
 
-            doReturn(expectedKey).when(avatarMinioService).upload(anyString(), any(), anyString());
+            doReturn(expectedKey).when(avatarMinioService).upload(anyString(), any(),anyInt(), anyString());
 
             // Act
             AvatarUploadResult result = avatarMinioService.uploadFromUrl(userId, imageUrl);

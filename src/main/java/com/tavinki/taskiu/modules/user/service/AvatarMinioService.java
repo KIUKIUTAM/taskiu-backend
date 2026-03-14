@@ -51,7 +51,7 @@ public class AvatarMinioService extends BaseMinioService {
 
         try (InputStream inputStream = new ByteArrayInputStream(imageBytes)) {
             String filename = userId + ".jpg";
-            String key = upload(filename, inputStream, "image/jpeg");
+            String key = upload(filename, inputStream, imageBytes.length, "image/jpeg");
             log.info("Avatar uploaded to MinIO for user: {}, key: {}", userId, key);
             return AvatarUploadResult.success(key);
         }
