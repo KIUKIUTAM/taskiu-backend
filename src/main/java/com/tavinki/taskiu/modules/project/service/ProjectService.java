@@ -57,7 +57,7 @@ public class ProjectService {
         project = projectRepository.save(project);
         
         if (project.getProjectPicture() != null) {
-            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()));
+            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()).orElse(null));
         }
         
         log.info("Created project: {} ({}) in team: {} by user: {}", name, projectId, teamId, creatorEmail);
@@ -69,7 +69,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
         
         if (project.getProjectPicture() != null) {
-            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()));
+            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()).orElse(null));
         }
         
         return project;
@@ -81,7 +81,7 @@ public class ProjectService {
         
         projects.forEach(project -> {
             if (project.getProjectPicture() != null) {
-                project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()));
+                project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()).orElse(null));
             }
         });
         
@@ -126,7 +126,7 @@ public class ProjectService {
         project = projectRepository.save(project);
         
         if (project.getProjectPicture() != null) {
-            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()));
+            project.setProjectPictureUrl(projectPictureMinioService.getPresignedUrl(project.getProjectPicture()).orElse(null));
         }
         
         return project;

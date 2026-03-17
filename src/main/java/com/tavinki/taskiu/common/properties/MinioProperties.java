@@ -12,6 +12,7 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "minio")
 public class MinioProperties {
     private String endpoint;
+    private String publicEndpoint;
     private String accessKey;
     private String secretKey;
     private String bucketName;

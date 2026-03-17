@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.tavinki.taskiu.modules.user.mapper.UserMapper;
+import com.tavinki.taskiu.modules.user.service.AvatarMinioService;
 import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
@@ -17,11 +18,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final AvatarMinioService avatarMinioService;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getCurrentUser(
             @AuthenticationPrincipal CustomUserDetails user) {
         log.info("Fetching current user info for user: {}", user != null ? user.getEmail() : "Anonymous");
-        return ResponseEntity.ok(UserMapper.toResponseDto(user));
+ 
+        return ResponseEntity.ok(getUserProfile(user));
     }
+
+    public UserResponseDto getUserProfile(CustomUserDetails userDetails) {
+    String pictureUrl = avatarMinioService.getPresignedUrl(userDetails.getPicture())
+            .orElse(userDetails.getPicture()); // fallback 原始 URL
+    
+    return UserMapper.toResponseDto(userDetails, pictureUrl);
+}
 }

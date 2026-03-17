@@ -1,6 +1,7 @@
 package com.tavinki.taskiu.common.minio;
 
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -41,18 +42,23 @@ public abstract class BaseMinioService {
      * Generate a presigned GET URL for the given key.
      * URL is valid for 7 days.
      */
-    public String getPresignedUrl(String key) {
+    public Optional<String> getPresignedUrl(String key) {
         if (key == null || key.isBlank()) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return minioClient.getPresignedObjectUrl(
+            String url = minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.GET)
                             .bucket(minioProperties.getBucketName())
                             .object(key)
                             .expiry(7, TimeUnit.DAYS)
                             .build());
+            String publicUrl = url.replace(
+                    minioProperties.getEndpoint(),
+                    minioProperties.getPublicEndpoint());
+
+            return Optional.of(publicUrl);
         } catch (Exception e) {
             log.error("Failed to generate presigned URL for key: {}", key, e);
             throw new MinioException("Failed to generate presigned URL for key: " + key, e);

@@ -93,12 +93,15 @@ public class UserMapper {
                                 .build();
         }
 
-        public static UserResponseDto toResponseDto(CustomUserDetails userDetails) {
+        public static UserResponseDto toResponseDto(CustomUserDetails userDetails ,String pictureUrl) {
+                if (userDetails == null)
+                        return null;
+                
         return UserResponseDto.builder()
                 .id(userDetails.getId())
                 .email(userDetails.getEmail())
                 .name(userDetails.getName())
-                .picture(userDetails.getPicture())
+                .picture(pictureUrl)
                 .role(userDetails.getRole())
                 .verified(userDetails.isVerified())
                 .banned(userDetails.isBanned())
