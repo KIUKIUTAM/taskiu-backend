@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +23,8 @@ import com.tavinki.taskiu.modules.project.dto.CreateProjectRequest;
 import com.tavinki.taskiu.modules.project.dto.UpdateProjectRequest;
 import com.tavinki.taskiu.modules.project.entity.Project;
 import com.tavinki.taskiu.modules.project.service.ProjectService;
-import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
-import jakarta.validation.Valid;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

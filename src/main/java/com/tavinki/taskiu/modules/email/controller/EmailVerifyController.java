@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.email.service.EmailService;
-import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
 
 import lombok.AllArgsConstructor;
