@@ -1,4 +1,4 @@
-package com.tavinki.taskiu.common.config;
+package com.tavinki.taskiu.common.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.tavinki.taskiu.common.properties.AppSecurityProperties;
 import com.tavinki.taskiu.common.properties.CorsProperties;
-import com.tavinki.taskiu.modules.auth.security.JwtAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
