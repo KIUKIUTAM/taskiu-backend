@@ -13,7 +13,7 @@ import com.tavinki.taskiu.modules.teams.repository.TeamMemberRepository;
 import com.tavinki.taskiu.modules.teams.repository.TeamRepository;
 import com.tavinki.taskiu.modules.user.entity.User;
 import com.tavinki.taskiu.modules.user.repository.UserJpaRepository;
-
+import com.tavinki.taskiu.modules.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,11 +25,12 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final UserJpaRepository userRepository;
+    private final UserService userService;
 
     @Transactional
-    public Team createTeam(String name, String description, User creator) {
+    public Team createTeam(String name, String description, String creatorUserId) {
         String teamId = generateUniqueTeamId();
-        
+        User user = userService.getUserById(creatorUserId);
         Team team = Team.builder()
                 .teamId(teamId)
                 .teamName(name)
@@ -39,9 +40,9 @@ public class TeamService {
         
         team = teamRepository.save(team);
         
-        addMemberToTeam(team, creator, TeamRole.OWNER);
+        addMemberToTeam(team, user, TeamRole.OWNER);
         
-        log.info("Created team: {} ({}) by user: {}", name, teamId, creator.getEmail());
+        log.info("Created team: {} ({}) by user: {}", name, teamId, user.getEmail());
         return team;
     }
 

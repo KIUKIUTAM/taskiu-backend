@@ -5,20 +5,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.tavinki.taskiu.modules.user.mapper.UserMapper;
+import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
 import lombok.extern.slf4j.Slf4j;
-
+import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getCurrentUser(
-            @AuthenticationPrincipal UserResponseDto user) {
+            @AuthenticationPrincipal CustomUserDetails user) {
         log.info("Fetching current user info for user: {}", user != null ? user.getEmail() : "Anonymous");
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserMapper.toResponseDto(user));
     }
 }

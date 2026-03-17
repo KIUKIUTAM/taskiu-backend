@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.tavinki.taskiu.common.annotations.attribute.TeamId;
 import com.tavinki.taskiu.common.annotations.role.RequireTeamRole;
+import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.common.enums.role.TeamRole;
 import com.tavinki.taskiu.modules.project.dto.CreateProjectRequest;
 import com.tavinki.taskiu.modules.project.dto.UpdateProjectRequest;
@@ -45,7 +46,7 @@ public class ProjectController {
             @PathVariable @TeamId String teamId,
             @Valid @RequestPart("data") CreateProjectRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal UserResponseDto currentUser) {
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
         
         Project project = projectService.createProject(teamId, request.getName(), request.getDescription(), file, currentUser.getEmail());
         

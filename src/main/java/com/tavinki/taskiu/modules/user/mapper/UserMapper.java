@@ -1,10 +1,12 @@
 package com.tavinki.taskiu.modules.user.mapper;
 
+import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.common.enums.LoginType;
 import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.modules.auth.dto.interfaces.OAuth2UserInfo;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 import com.tavinki.taskiu.modules.user.entity.User;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -90,4 +92,18 @@ public class UserMapper {
                                 .role(user.getRole())
                                 .build();
         }
+
+        public static UserResponseDto toResponseDto(CustomUserDetails userDetails) {
+        return UserResponseDto.builder()
+                .id(userDetails.getId())
+                .email(userDetails.getEmail())
+                .name(userDetails.getName())
+                .picture(userDetails.getPicture())
+                .role(userDetails.getRole())
+                .verified(userDetails.isVerified())
+                .banned(userDetails.isBanned())
+                .build();
+        }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
 import com.tavinki.taskiu.modules.email.service.EmailService;
 import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
@@ -36,7 +37,7 @@ public class EmailVerifyController {
     private final AuthService authService;
 
     @PostMapping("/send-verify-email")
-    public ResponseEntity<Map<String, Object>> sendEmail(@AuthenticationPrincipal UserResponseDto user) {
+    public ResponseEntity<Map<String, Object>> sendEmail(@AuthenticationPrincipal CustomUserDetails user) {
         if (user == null || user.getEmail() == null) {
             log.warn("Unauthorized attempt to send verification email.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -61,7 +62,7 @@ public class EmailVerifyController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<Map<String, Object>> verifyEmail(@AuthenticationPrincipal UserResponseDto user,
+    public ResponseEntity<Map<String, Object>> verifyEmail(@AuthenticationPrincipal CustomUserDetails user,
             @RequestBody VerifyRequest request) {
 
         if (user == null || user.getEmail() == null) {

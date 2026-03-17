@@ -1,5 +1,6 @@
 package com.tavinki.taskiu.common.utils;
 
+import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.common.enums.role.SystemRole;
 import com.tavinki.taskiu.common.properties.AppTokenProperties;
 import io.jsonwebtoken.Claims;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import com.tavinki.taskiu.modules.user.dto.UserResponseDto;
 
 @Service
 @RequiredArgsConstructor
@@ -100,13 +100,13 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public Optional<UserResponseDto> extractUserFromToken(String jwt) {
+    public Optional<CustomUserDetails> extractUserFromToken(String jwt) {
 
         Claims claims = getClaims(jwt).orElse(null);
         if (claims == null) {
             return Optional.empty();
         }
-        return Optional.of(UserResponseDto.builder()
+        return Optional.of(CustomUserDetails.builder()
                 .id(claims.getSubject())
                 .name((String) claims.get("name"))
                 .email((String) claims.get("email"))
