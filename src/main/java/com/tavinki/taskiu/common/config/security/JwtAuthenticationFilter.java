@@ -37,14 +37,6 @@ import lombok.extern.slf4j.Slf4j;
  * <h3>How to get the current logged-in user (Usage):</h3>
  * In the Controller, use the {@code @AuthenticationPrincipal} annotation to directly get the user object:
  *
- * <pre>
- * &#64;GetMapping("/me")
- * public ResponseEntity&lt;CustomUserDetails&gt; getCurrentUser(
- *         &#64;AuthenticationPrincipal CustomUserDetails user) {
- *     return ResponseEntity.ok(UserMapper.toResponseDto(user));
- * }
- * </pre>
- *
  * @see AuthService#extractUserFromToken(String)
  */
 @Component
