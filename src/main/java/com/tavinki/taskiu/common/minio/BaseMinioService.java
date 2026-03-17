@@ -35,8 +35,14 @@ public abstract class BaseMinioService {
     protected abstract String getPrefix();
 
     protected String buildKey(String filename) {
-        return getPrefix() + UUID.randomUUID() + "_" + filename;
+    String ext = "";
+    int dotIndex = filename.lastIndexOf('.');
+    if (dotIndex != -1) {
+        ext = filename.substring(dotIndex);
     }
+
+    return getPrefix() + UUID.randomUUID() + ext;
+  }
 
     /**
      * Generate a presigned GET URL for the given key.
@@ -54,11 +60,7 @@ public abstract class BaseMinioService {
                             .object(key)
                             .expiry(7, TimeUnit.DAYS)
                             .build());
-            String publicUrl = url.replace(
-                    minioProperties.getEndpoint(),
-                    minioProperties.getPublicEndpoint());
-
-            return Optional.of(publicUrl);
+            return Optional.of(url);
         } catch (Exception e) {
             log.error("Failed to generate presigned URL for key: {}", key, e);
             throw new MinioException("Failed to generate presigned URL for key: " + key, e);
