@@ -136,6 +136,9 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:admin}
   secret-key: ${MINIO_SECRET_KEY:password123}
   bucket-name: ${MINIO_BUCKET_NAME:taskiu-bucket-dev}
+  prefix:
+    avatar: "avatars/"
+    attachment: "attachments/"
 
 cloudflare:
   turnstile:
