@@ -109,11 +109,11 @@ public class RefreshTokenService {
 
     public ResponseCookie generateRefreshTokenCookieForm(String validRefreshToken) {
         return ResponseCookie.from("refreshToken", validRefreshToken)
-                .httpOnly(false)
-                .secure(false)
+                .httpOnly(true)
+                .secure(true)
                 .path("/")
                 .maxAge(7L * 24 * 60 * 60)
-                .sameSite("Lax")
+                .sameSite("Strict")
                 .build();
     }
 

@@ -4,29 +4,34 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpHeaders;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tavinki.taskiu.common.config.security.CustomUserDetails;
 import com.tavinki.taskiu.modules.auth.service.AuthService;
+import com.tavinki.taskiu.modules.auth.service.RefreshTokenService;
 import com.tavinki.taskiu.modules.email.service.EmailService;
 import com.tavinki.taskiu.modules.user.entity.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/email")
 @RequiredArgsConstructor
 @Slf4j
 public class EmailVerifyController {
+
     private static final String MESSAGE = "message";
 
     private static final String ACCESS_TOKEN = "accessToken";
@@ -34,6 +39,8 @@ public class EmailVerifyController {
     private final EmailService emailService;
 
     private final AuthService authService;
+
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/send-verify-email")
     public ResponseEntity<Map<String, Object>> sendEmail(@AuthenticationPrincipal CustomUserDetails user) {
@@ -61,21 +68,41 @@ public class EmailVerifyController {
     }
 
     @PostMapping("/verify-email")
-    public ResponseEntity<Map<String, Object>> verifyEmail(@AuthenticationPrincipal CustomUserDetails user,
-            @RequestBody VerifyRequest request) {
+    public ResponseEntity<Map<String, Object>> verifyEmail(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody VerifyRequest request,
+            HttpServletRequest httpRequest) {
 
         if (user == null || user.getEmail() == null) {
             log.warn("Unauthorized attempt to send verification email.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(MESSAGE, "User is not authenticated"));
         }
+
         String toEmail = Objects.requireNonNull(user.getEmail());
-        // Process verification and set the email as verified if successful
+
         User verifiedUser = emailService.verifyProcess(toEmail, request.getCode());
+
+        log.info("test2026: Verification attempt for email: {}, code: {}, verifiedUser: {}",
+                toEmail, request.getCode(), verifiedUser.toString());
         if (verifiedUser != null) {
             log.info("Email verification successful for email: {}", toEmail);
+
             String accessToken = authService.generateJwtToken(verifiedUser);
-            return ResponseEntity.ok(Map.of(MESSAGE, "verification successful", ACCESS_TOKEN, accessToken));
+
+            String ipAddress = httpRequest.getRemoteAddr();
+            String userAgent = httpRequest.getHeader("User-Agent");
+            String newRefreshToken = refreshTokenService.generateRefreshToken(
+                    verifiedUser.getId(), ipAddress, userAgent);
+
+            ResponseCookie refreshTokenCookie = refreshTokenService
+                    .generateRefreshTokenCookieForm(newRefreshToken);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                    .body(Map.of(
+                            MESSAGE, "verification successful",
+                            ACCESS_TOKEN, accessToken));
         } else {
             log.warn("Email verification failed for email: {}", toEmail);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -83,8 +83,8 @@ public class UserServicePostgresImpl implements UserService {
                 .orElseThrow(() -> new EmailNotFoundException("User with email " + email + " not found."));
 
         user.setVerified(true);
-
+        userRepository.save(user);
         // save method returns the updated entity
-        return userRepository.save(user);
+        return user;
     }
 }
