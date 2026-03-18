@@ -44,7 +44,7 @@ public class User {
 
 
     @Builder.Default
-    private String picture = "avatar/default_Avatar.avif";
+    private String picture = "avatars/default_Avatar.avif";
 
     private String password;
 
