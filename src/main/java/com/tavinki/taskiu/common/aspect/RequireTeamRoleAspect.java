@@ -1,4 +1,3 @@
-// com/tavinki/taskiu/common/aspect/RequireTeamRoleAspect.java
 package com.tavinki.taskiu.common.aspect;
 
 import java.lang.annotation.Annotation;
