@@ -36,7 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'io.minio:minio:8.5.4'
+    implementation 'io.minio:minio:8.6.0'
     implementation 'commons-io:commons-io:2.19.0'
     
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
