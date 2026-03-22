@@ -9,6 +9,6 @@ public class TestController {
 
     @RequestMapping("/users")
     public String getUsers() {
-        return "List of users";
+        return "Hello, this is a test endpoint for users!";
     }
 }
