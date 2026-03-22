@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(appSecurityConfig.getWhitelist().toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
